@@ -1,21 +1,20 @@
-# React + Vite Golazo
+# React + Vite
 
-## Requisitos
-- Node.js 18+
+Proyecto en React (Vite), estructurado como monorepo (frontend/backend).
+
+## Estructura
+- `frontend/`: aplicación React + Vite
+- `backend/`: pendiente por definir
 
 ## Instalación
+
 \`\`\`bash
-git clone <url-del-repo>
-cd nombre-proyecto
+git clone https://github.com/juan2670/Golazo-react.git
+cd Golazo-react/frontend
 npm install
 cp .env.example .env
 npm run dev
 \`\`\`
-
-## Estructura
-- `src/components`: componentes reutilizables
-- `src/pages`: vistas por ruta
-- `src/services`: llamadas a API
 
 ## Ramas
 - `main`: producción
