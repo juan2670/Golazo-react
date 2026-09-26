@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+@font-face {
+  font-family: 'Gatorade';
+  src: url('../assets/fonts/Gatorade/gatorade-black.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --color-white: rgb(255, 255, 255);
+  --color-cyan: rgb(64, 205, 242);
+  --color-green-light: rgb(75, 165, 30);
+  --color-green-dark: rgb(45, 130, 15);
+
+  --font-text: 'Nunito', sans-serif;
+  --font-title: 'Gatorade', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-text);
+  color: #1a1a1a;
+  background-color: var(--color-white);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-title);
+}
