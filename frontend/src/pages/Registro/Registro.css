@@ -1,0 +1,192 @@
+.registro {
+  min-height: calc(100vh - 72px);
+
+  display: flex;
+  justify-content: center;
+
+  padding: 6rem 7%;
+
+  background: #111111;
+  color: #ffffff;
+}
+
+.registro__container {
+  width: 100%;
+  max-width: 700px;
+}
+
+.registro__header {
+  margin-bottom: 3rem;
+}
+
+.registro__header p {
+  margin: 0 0 1rem;
+
+  color: var(--color-primary);
+
+  font-size: 0.8rem;
+  font-weight: 900;
+
+  letter-spacing: 4px;
+}
+
+.registro__header h1 {
+  margin: 0 0 1rem;
+
+  font-size: clamp(3.5rem, 7vw, 6rem);
+  line-height: 0.9;
+}
+
+.registro__header span {
+  color: #888888;
+
+  line-height: 1.6;
+}
+
+/* =========================
+   FORMULARIO
+========================= */
+
+.registro__form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 1.4rem;
+
+  padding: 2.5rem;
+
+  border: 1px solid #2c2c2c;
+  border-radius: 10px;
+
+  background: #181818;
+}
+
+.registro__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 1.2rem;
+}
+
+.registro__field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.6rem;
+}
+
+.registro__field label {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.registro__field input {
+  width: 100%;
+
+  padding: 14px;
+
+  border: 1px solid #333333;
+  border-radius: 5px;
+
+  outline: none;
+
+  background: #101010;
+  color: #ffffff;
+}
+
+.registro__field input:focus {
+  border-color: var(--color-primary);
+}
+
+.registro__field input::placeholder {
+  color: #555555;
+}
+
+/* =========================
+   TÉRMINOS
+========================= */
+
+.registro__terms {
+  display: flex;
+  align-items: center;
+
+  gap: 0.7rem;
+
+  color: #777777;
+
+  font-size: 0.8rem;
+}
+
+.registro__terms input {
+  accent-color: var(--color-primary);
+}
+
+/* =========================
+   BOTÓN
+========================= */
+
+.registro__form > button {
+  width: 100%;
+
+  padding: 15px;
+
+  border: none;
+  border-radius: 5px;
+
+  background: var(--color-primary);
+  color: #111111;
+
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.registro__form > button:hover {
+  background: var(--color-primary-hover);
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.registro__footer {
+  display: flex;
+  justify-content: center;
+
+  gap: 0.4rem;
+
+  margin-top: 2rem;
+
+  color: #666666;
+
+  font-size: 0.85rem;
+}
+
+.registro__footer a {
+  color: var(--color-primary);
+
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.registro__footer a:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 600px) {
+  .registro {
+    padding: 4rem 6%;
+  }
+
+  .registro__form {
+    padding: 1.5rem;
+  }
+
+  .registro__row {
+    grid-template-columns: 1fr;
+  }
+}
