@@ -1,0 +1,126 @@
+.reservas {
+  min-height: calc(100vh - 72px);
+  padding: 5rem 7%;
+  background: #111111;
+  color: #ffffff;
+}
+
+.reservas__header {
+  max-width: 700px;
+  margin-bottom: 3rem;
+}
+
+.reservas__header p {
+  margin: 0 0 1rem;
+  color: #8cff00;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+}
+
+.reservas__header h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 0.95;
+}
+
+.reservas__header span {
+  color: #bdbdbd;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.reservas__content {
+  max-width: 900px;
+}
+
+.reservas__card {
+  padding: 2.5rem;
+  border: 1px solid #2c2c2c;
+  border-radius: 12px;
+  background: #181818;
+}
+
+.reservas__card h2 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+.reservas__form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.form__group label {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.form__group input,
+.form__group select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #333333;
+  border-radius: 6px;
+  background: #101010;
+  color: #ffffff;
+}
+
+.reservas__summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2rem 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid #2c2c2c;
+}
+
+.reservas__summary strong {
+  font-size: 1.5rem;
+  color: #8cff00;
+}
+
+.reservas__card button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 6px;
+  background: #8cff00;
+  color: #111111;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.reservas__card button:hover {
+  opacity: 0.85;
+}
+
+.reservas__message {
+  margin: 1.5rem 0 0;
+  padding: 1rem;
+  border-radius: 6px;
+  background: #222222;
+  color: #8cff00;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 700px) {
+  .reservas {
+    padding: 4rem 6%;
+  }
+
+  .reservas__card {
+    padding: 1.5rem;
+  }
+
+  .reservas__form {
+    grid-template-columns: 1fr;
+  }
+}
