@@ -1,9 +1,37 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+
+import { api } from '../../services/api'
 import './Login.css'
 
 function Login() {
-  const handleSubmit = (event) => {
+  const navigate = useNavigate()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (event) => {
     event.preventDefault()
+
+    setError('')
+    setLoading(true)
+
+    try {
+      const data = await api.post('/usuarios/login', {
+        email,
+        password,
+      })
+
+      localStorage.setItem('golazo_token', data.access_token)
+
+      navigate('/reservas')
+    } catch (error) {
+      setError(error.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -27,6 +55,7 @@ function Login() {
 
       <div className="auth__form-container">
         <div className="auth__form">
+
           <div className="auth__header">
             <p>BIENVENIDO DE NUEVO</p>
 
@@ -38,6 +67,7 @@ function Login() {
           </div>
 
           <form onSubmit={handleSubmit}>
+
             <div className="auth__field">
               <label htmlFor="email">
                 Correo electrónico
@@ -47,6 +77,8 @@ function Login() {
                 id="email"
                 type="email"
                 placeholder="tu@email.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 required
               />
             </div>
@@ -60,6 +92,8 @@ function Login() {
                 id="password"
                 type="password"
                 placeholder="••••••••"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
                 required
               />
             </div>
@@ -75,9 +109,20 @@ function Login() {
               </button>
             </div>
 
-            <button className="auth__submit" type="submit">
-              Iniciar sesión
+            {error && (
+              <p className="auth__error">
+                {error}
+              </p>
+            )}
+
+            <button
+              className="auth__submit"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
+
           </form>
 
           <div className="auth__footer">
@@ -87,6 +132,7 @@ function Login() {
               Crear cuenta
             </Link>
           </div>
+
         </div>
       </div>
     </section>
