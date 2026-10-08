@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.dependencies import get_current_user
 from app.core.security import (
     create_access_token,
     hash_password,
@@ -13,6 +14,14 @@ from app.schemas.usuario import (
     UsuarioCreate,
     UsuarioLogin,
     UsuarioResponse,
+)
+
+from app.schemas.usuario import (
+    TokenResponse,
+    UsuarioCreate,
+    UsuarioLogin,
+    UsuarioResponse,
+    UsuarioUpdate,
 )
 
 
@@ -98,3 +107,30 @@ def iniciar_sesion(
         "access_token": access_token,
         "token_type": "bearer",
     }
+    
+@router.get("/me", response_model=UsuarioResponse)
+def obtener_usuario_actual(
+    usuario_actual: Usuario = Depends(get_current_user),
+):
+    return usuario_actual
+
+
+@router.patch("/me", response_model=UsuarioResponse)
+def actualizar_usuario_actual(
+    datos: UsuarioUpdate,
+    usuario_actual: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if datos.nombre is not None:
+        usuario_actual.nombre = datos.nombre
+
+    if datos.apellido is not None:
+        usuario_actual.apellido = datos.apellido
+
+    if datos.telefono is not None:
+        usuario_actual.telefono = datos.telefono
+
+    db.commit()
+    db.refresh(usuario_actual)
+
+    return usuario_actual

@@ -143,4 +143,32 @@
   .navbar__login {
     padding: 8px 13px;
   }
+
+  .navbar__actions {
+    gap: 6px;
+  }
+
+  .navbar__logout {
+    font-size: 0.75rem;
+  }
+}
+
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar__logout {
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.navbar__logout:hover {
+  color: var(--color-primary);
 }

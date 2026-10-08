@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../../services/api'
 import './Login.css'
 
+import { useAuth } from '../../context/AuthContext'
+
 function Login() {
   const navigate = useNavigate()
 
@@ -11,6 +13,7 @@ function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const { login } = useAuth()
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -24,7 +27,7 @@ function Login() {
         password,
       })
 
-      localStorage.setItem('golazo_token', data.access_token)
+      login(data.access_token)
 
       navigate('/reservas')
     } catch (error) {
