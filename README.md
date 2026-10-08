@@ -1,52 +1,104 @@
-# ⚽ Golazo React
+# GOLAZO
 
-Sistema web para la gestión integral de un complejo deportivo enfocado principalmente en la reserva de canchas de fútbol y la venta de productos deportivos.
+Sistema web para la gestión de un complejo deportivo enfocado en fútbol, desarrollado como una aplicación full-stack con React, FastAPI y PostgreSQL.
 
-El proyecto está desarrollado como una aplicación **full-stack** utilizando **React + Vite** para el frontend y **FastAPI + PostgreSQL** para el backend.
-
-Actualmente se encuentra en desarrollo y cuenta con una base funcional de autenticación, gestión de canchas y reservas, además de una interfaz web orientada a una futura plataforma completa de servicios deportivos.
+Golazo permite gestionar usuarios, autenticación, reservas de canchas, disponibilidad de horarios y próximamente productos, pedidos y administración del sistema.
 
 ---
 
-## 📌 Descripción del proyecto
+## Estado del proyecto
 
-**Golazo** busca centralizar diferentes servicios de un complejo deportivo en una sola plataforma.
+El proyecto se encuentra en desarrollo activo.
 
-El sistema está diseñado para permitir que los usuarios puedan:
-
-* Consultar las canchas disponibles.
-* Consultar horarios disponibles.
-* Realizar reservas.
-* Consultar y cancelar sus reservas.
-* Registrarse e iniciar sesión.
-* Consultar productos deportivos.
-* Agregar productos a un carrito de compras.
-* Consultar información del complejo deportivo.
-* Consultar la ubicación.
-* Contactar con el establecimiento.
-
-A futuro, el sistema contará también con funcionalidades administrativas, gestión completa de productos, pedidos, pagos y una integración completa entre frontend y backend.
+| Módulo                          | Estado        |
+| ------------------------------- | ------------- |
+| Landing / Home                  | Implementado  |
+| Navegación                      | Implementado  |
+| Diseño responsive               | Implementado  |
+| Reservas                        | Implementado  |
+| Disponibilidad de canchas       | Implementado  |
+| Cancelación de reservas         | Implementado  |
+| Historial de reservas           | Implementado  |
+| Registro de usuarios            | Implementado  |
+| Login                           | Implementado  |
+| JWT Authentication              | Implementado  |
+| Protección de rutas             | Implementado  |
+| Perfil de usuario               | Implementado  |
+| Edición de perfil               | Implementado  |
+| Tienda                          | En desarrollo |
+| Carrito                         | Implementado  |
+| Productos conectados al backend | Pendiente     |
+| Pedidos                         | Pendiente     |
+| Administración                  | Pendiente     |
+| PostgreSQL                      | Implementado  |
+| SQLAlchemy                      | Implementado  |
+| Alembic                         | Implementado  |
+| Validaciones backend            | Implementado  |
+| Pruebas automatizadas           | Pendiente     |
+| Despliegue                      | Pendiente     |
 
 ---
 
-# 🏗️ Arquitectura
+## Objetivo
 
-El proyecto utiliza una arquitectura separada entre frontend y backend:
+Construir una plataforma web moderna para un complejo deportivo que permita centralizar:
+
+* Registro y autenticación de usuarios.
+* Gestión de perfiles.
+* Reserva de canchas.
+* Consulta de disponibilidad.
+* Cancelación de reservas.
+* Historial de reservas.
+* Catálogo de productos deportivos.
+* Carrito de compras.
+* Gestión de pedidos.
+* Administración de usuarios, canchas y productos.
+* Integración futura con servicios externos.
+* Administración segura de la información.
+
+El proyecto busca aplicar buenas prácticas de desarrollo full-stack, arquitectura por capas, seguridad, validación de datos, control de acceso y persistencia en base de datos.
+
+---
+
+# Arquitectura
 
 ```text
-Golazo-react/
-│
-├── frontend/          # Aplicación web React
-│
-├── backend/           # API REST con FastAPI
-│
-├── README.md
-└── package-lock.json
+┌─────────────────────────────┐
+│           React             │
+│          Frontend           │
+│                             │
+│  Pages / Components /       │
+│  Context / Services /       │
+│  Protected Routes           │
+└──────────────┬──────────────┘
+               │ HTTP / JSON
+               ▼
+┌─────────────────────────────┐
+│          FastAPI            │
+│           Backend           │
+│                             │
+│ Routers / Schemas /         │
+│ Services / Security         │
+└──────────────┬──────────────┘
+               │
+               ▼
+┌─────────────────────────────┐
+│         SQLAlchemy          │
+│          ORM                │
+└──────────────┬──────────────┘
+               │
+               ▼
+┌─────────────────────────────┐
+│        PostgreSQL           │
+│          Database           │
+└─────────────────────────────┘
 ```
 
-### Frontend
+---
 
-Construido con:
+# Tecnologías
+
+## Frontend
 
 * React
 * Vite
@@ -54,158 +106,154 @@ Construido con:
 * JavaScript
 * CSS
 * Context API
+* Fetch API
+* LocalStorage para persistencia temporal del JWT
 
-### Backend
-
-Construido con:
+## Backend
 
 * Python
 * FastAPI
 * SQLAlchemy
-* PostgreSQL
 * Pydantic
-* JWT
+* PyJWT
+* pwdlib
 * Argon2
 * Alembic
+* Uvicorn
+
+## Base de datos
+
+* PostgreSQL 18
+
+## Herramientas
+
+* Visual Studio Code
+* Git
+* GitHub
+* Git Bash / PowerShell
+* pgAdmin
+* Swagger / OpenAPI
+* Azure DevOps
 
 ---
 
-# 🖥️ Tecnologías utilizadas
-
-## Frontend
-
-| Tecnología   | Uso                           |
-| ------------ | ----------------------------- |
-| React        | Construcción de la interfaz   |
-| Vite         | Entorno de desarrollo y build |
-| React Router | Navegación entre páginas      |
-| JavaScript   | Lógica de la aplicación       |
-| CSS          | Diseño y estilos              |
-| Context API  | Gestión global del carrito    |
-
-## Backend
-
-| Tecnología | Uso                             |
-| ---------- | ------------------------------- |
-| Python     | Lenguaje principal              |
-| FastAPI    | Desarrollo de la API REST       |
-| SQLAlchemy | ORM y acceso a la base de datos |
-| PostgreSQL | Base de datos relacional        |
-| Pydantic   | Validación de datos             |
-| PyJWT      | Autenticación mediante tokens   |
-| Argon2     | Hash seguro de contraseñas      |
-| Alembic    | Migraciones de base de datos    |
-| Uvicorn    | Servidor ASGI                   |
-
----
-
-# 📂 Estructura del proyecto
-
-## Frontend
+# Estructura del proyecto
 
 ```text
-frontend/
-└── src/
-    ├── components/
-    │   ├── Navbar/
-    │   ├── Footer/
-    │   ├── Button/
-    │   ├── Card/
-    │   └── Modal/
-    │
-    ├── context/
-    │   └── CartContext.jsx
-    │
-    ├── layouts/
-    │   ├── MainLayout.jsx
-    │   └── AdminLayout.jsx
-    │
-    ├── pages/
-    │   ├── Home/
-    │   ├── Reservas/
-    │   ├── Tienda/
-    │   ├── Carrito/
-    │   ├── Producto/
-    │   ├── Nosotros/
-    │   ├── Ubicacion/
-    │   ├── Contacto/
-    │   ├── Login/
-    │   ├── Registro/
-    │   ├── Perfil/
-    │   └── Admin/
-    │
-    ├── routes/
-    │   └── AppRoutes.jsx
-    │
-    ├── services/
-    │   └── api.js
-    │
-    └── styles/
-        └── globals.css
-```
-
-## Backend
-
-```text
-backend/
-├── app/
-│   ├── core/
-│   │   ├── security.py
-│   │   └── dependencies.py
-│   │
-│   ├── models/
-│   │   ├── usuario.py
-│   │   ├── cancha.py
-│   │   ├── reserva.py
-│   │   ├── producto.py
-│   │   ├── pedido.py
-│   │   └── detalle_pedido.py
-│   │
-│   ├── routers/
-│   │   ├── canchas.py
-│   │   ├── reservas.py
-│   │   └── usuarios.py
-│   │
-│   ├── schemas/
-│   │   ├── cancha.py
-│   │   ├── reserva.py
-│   │   └── usuario.py
-│   │
-│   ├── services/
-│   │
-│   ├── database.py
-│   └── main.py
+Golazo-react/
 │
-├── migrations/
-│   ├── env.py
-│   ├── script.py.mako
-│   └── versions/
+├── backend/
+│   ├── app/
+│   │   ├── core/
+│   │   │   ├── __init__.py
+│   │   │   ├── dependencies.py
+│   │   │   └── security.py
+│   │   │
+│   │   ├── models/
+│   │   │   ├── __init__.py
+│   │   │   ├── usuario.py
+│   │   │   ├── cancha.py
+│   │   │   ├── reserva.py
+│   │   │   ├── producto.py
+│   │   │   ├── pedido.py
+│   │   │   └── detalle_pedido.py
+│   │   │
+│   │   ├── routers/
+│   │   │   ├── __init__.py
+│   │   │   ├── usuarios.py
+│   │   │   ├── canchas.py
+│   │   │   └── reservas.py
+│   │   │
+│   │   ├── schemas/
+│   │   │   ├── __init__.py
+│   │   │   ├── usuario.py
+│   │   │   ├── cancha.py
+│   │   │   └── reserva.py
+│   │   │
+│   │   ├── services/
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── database.py
+│   │   └── main.py
+│   │
+│   ├── migrations/
+│   │   ├── README
+│   │   ├── env.py
+│   │   ├── script.py.mako
+│   │   └── versions/
+│   │
+│   ├── tests/
+│   │   └── __init__.py
+│   │
+│   ├── .env
+│   ├── .gitignore
+│   ├── alembic.ini
+│   ├── requirements.txt
+│   └── test_db.py
 │
-├── tests/
-├── .env
-├── .gitignore
-├── alembic.ini
-├── requirements.txt
-└── test_db.py
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Navbar/
+│   │   │   ├── Footer/
+│   │   │   ├── Button/
+│   │   │   ├── Card/
+│   │   │   └── Modal/
+│   │   │
+│   │   ├── context/
+│   │   │   ├── AuthContext.jsx
+│   │   │   └── CartContext.jsx
+│   │   │
+│   │   ├── layouts/
+│   │   │   ├── MainLayout.jsx
+│   │   │   └── AdminLayout.jsx
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── Home/
+│   │   │   ├── Reservas/
+│   │   │   ├── Tienda/
+│   │   │   ├── Carrito/
+│   │   │   ├── Producto/
+│   │   │   ├── Nosotros/
+│   │   │   ├── Ubicacion/
+│   │   │   ├── Contacto/
+│   │   │   ├── Login/
+│   │   │   ├── Registro/
+│   │   │   ├── Perfil/
+│   │   │   └── Admin/
+│   │   │
+│   │   ├── routes/
+│   │   │   ├── AppRoutes.jsx
+│   │   │   └── ProtectedRoute.jsx
+│   │   │
+│   │   ├── services/
+│   │   │   └── api.js
+│   │   │
+│   │   └── styles/
+│   │       └── globals.css
+│   │
+│   ├── package.json
+│   └── package-lock.json
+│
+├── README.md
+└── package.json
 ```
 
 ---
 
-# ⚙️ Funcionalidades actuales
+# Autenticación
 
-## 🔐 Autenticación
+El sistema cuenta actualmente con autenticación basada en JWT.
 
-El backend cuenta con un sistema inicial de autenticación.
+## Registro
 
-### Registro
-
-Permite crear usuarios mediante:
+Endpoint:
 
 ```text
 POST /usuarios/registro
 ```
 
-Los datos principales son:
+Permite crear nuevos usuarios con:
 
 * Nombre
 * Apellido
@@ -213,211 +261,218 @@ Los datos principales son:
 * Contraseña
 * Teléfono
 
-Las contraseñas no se almacenan directamente. Se almacenan utilizando un hash seguro mediante **Argon2**.
+Las contraseñas nunca se almacenan directamente. Se convierten en hashes seguros utilizando Argon2 mediante `pwdlib`.
 
-### Login
+---
+
+## Login
+
+Endpoint:
 
 ```text
 POST /usuarios/login
 ```
 
-El usuario proporciona sus credenciales y el backend genera un **JWT** para autenticar las solicitudes posteriores.
-
----
-
-# ⚽ Gestión de canchas
-
-El backend permite consultar y crear canchas.
-
-### Obtener canchas
-
-```text
-GET /canchas/
-```
-
-### Crear cancha
-
-```text
-POST /canchas/
-```
-
-Cada cancha contiene información como:
-
-```text
-id
-nombre
-tipo
-precio_hora
-capacidad
-estado
-```
-
-Ejemplo:
+El usuario proporciona:
 
 ```json
 {
-  "nombre": "Cancha 1",
-  "tipo": "Fútbol 5",
-  "precio_hora": 50000,
-  "capacidad": 10,
-  "estado": true
+  "email": "usuario@email.com",
+  "password": "********"
 }
 ```
 
----
+Si las credenciales son correctas, el backend genera un JWT.
 
-# 📅 Sistema de reservas
-
-El sistema cuenta con una lógica inicial para gestionar reservas.
-
-Actualmente permite:
-
-* Crear reservas.
-* Consultar las reservas del usuario autenticado.
-* Cancelar reservas.
-* Consultar disponibilidad.
-* Evitar reservas duplicadas.
-* Validar duración mínima.
-* Calcular automáticamente el precio.
-* Verificar que la cancha exista.
-* Verificar que la cancha esté activa.
-
-### Crear reserva
+El frontend almacena temporalmente el token y lo envía en las peticiones protegidas mediante:
 
 ```text
-POST /reservas/
+Authorization: Bearer <token>
 ```
-
-La reserva utiliza:
-
-```json
-{
-  "cancha_id": 1,
-  "fecha": "2026-10-15",
-  "hora_inicio": "18:00",
-  "hora_fin": "20:00"
-}
-```
-
-El precio total es calculado por el backend utilizando el precio de la cancha y la duración de la reserva.
-
-### Consultar reservas
-
-```text
-GET /reservas/
-```
-
-Esta ruta requiere autenticación y devuelve únicamente las reservas del usuario autenticado.
-
-### Consultar disponibilidad
-
-```text
-GET /reservas/disponibilidad
-```
-
-Ejemplo:
-
-```text
-/reservas/disponibilidad?cancha_id=1&fecha=2026-10-15
-```
-
-La API devuelve los horarios disponibles y ocupados para la cancha seleccionada.
-
-### Cancelar reserva
-
-```text
-PATCH /reservas/{reserva_id}/cancelar
-```
-
-El usuario solamente puede cancelar sus propias reservas.
 
 ---
 
-# 🛒 Tienda
+## Usuario autenticado
 
-El frontend cuenta actualmente con una tienda de productos deportivos.
+Endpoint:
 
-Incluye:
+```text
+GET /usuarios/me
+```
 
-* Productos.
-* Categorías.
-* Precios.
-* Carrito de compras.
-* Cantidades.
-* Subtotales.
-* Total de compra.
-* Eliminación de productos.
-* Actualización de cantidades.
+Obtiene la información del usuario correspondiente al JWT actual.
 
-El carrito se administra mediante **React Context API**.
+El backend valida:
 
-Actualmente algunos productos todavía utilizan información estática en el frontend.
-
-La integración completa con el backend está prevista para una siguiente etapa.
+1. Existencia del token.
+2. Firma del JWT.
+3. Expiración.
+4. Identificador del usuario.
+5. Existencia del usuario en PostgreSQL.
 
 ---
 
-# 🧭 Páginas principales
+## Actualización del perfil
 
-Actualmente el frontend contempla las siguientes rutas:
+Endpoint:
 
 ```text
-/
-├── /reservas
-├── /tienda
-├── /carrito
-├── /nosotros
-├── /ubicacion
-├── /login
-└── /registro
+PATCH /usuarios/me
 ```
 
-También existe una estructura preparada para:
+Actualmente permite modificar:
+
+* Nombre
+* Apellido
+* Teléfono
+
+El usuario se obtiene directamente desde el token, evitando que el cliente pueda indicar arbitrariamente el ID de otro usuario.
+
+---
+
+# Protección de rutas
+
+El frontend utiliza un componente `ProtectedRoute`.
+
+Actualmente están protegidas:
 
 ```text
 /perfil
-/admin
-/producto
-/contacto
+/reservas
+```
+
+Flujo:
+
+```text
+Usuario
+   │
+   ▼
+Ruta protegida
+   │
+   ├── Autenticado ──► Página
+   │
+   └── No autenticado
+             │
+             ▼
+           /login
+```
+
+Esto evita que usuarios sin sesión accedan directamente a páginas privadas.
+
+---
+
+# Sistema de reservas
+
+El módulo de reservas permite consultar canchas, verificar disponibilidad y gestionar reservas.
+
+## Funcionalidades
+
+* Consulta de canchas.
+* Consulta de disponibilidad.
+* Selección de fecha.
+* Selección de hora.
+* Duración de la reserva.
+* Cálculo automático del precio.
+* Creación de reservas.
+* Validación de horarios.
+* Prevención de reservas solapadas.
+* Cancelación.
+* Historial de reservas.
+* Protección mediante autenticación.
+
+---
+
+## Horarios
+
+Las canchas funcionan dentro del rango:
+
+```text
+08:00 → 00:00
+```
+
+Las reservas se manejan por horas completas.
+
+Actualmente se contemplan duraciones como:
+
+```text
+1 hora
+2 horas
 ```
 
 ---
 
-# 🎨 Diseño
+## Reglas del backend
 
-La interfaz utiliza una identidad visual inspirada en el fútbol y los complejos deportivos.
+El backend valida:
 
-Características principales:
+* Que la cancha exista.
+* Que la cancha esté activa.
+* Que la fecha no sea pasada.
+* Que la hora esté dentro del horario permitido.
+* Que la duración sea válida.
+* Que no exista otra reserva en conflicto.
+* Que el usuario esté autenticado.
+* Que la reserva pertenezca al usuario que intenta cancelarla.
 
-* Tema oscuro.
-* Negro como color principal.
-* Blanco para contenido.
-* Verde neón como color de énfasis.
-* Diseño responsive.
-* Componentes reutilizables.
-* Fotografías deportivas.
-* Tarjetas y botones personalizados.
-* Navegación mediante React Router.
-
-Color principal de énfasis:
+El precio se calcula utilizando el precio de la cancha y la duración:
 
 ```text
-#8cff00
+precio total = precio por hora × número de horas
 ```
 
 ---
 
-# 🗄️ Base de datos
+# Endpoints actuales
 
-El proyecto utiliza **PostgreSQL**.
-
-Base de datos de desarrollo:
+## Usuarios
 
 ```text
-golazo_db
+POST  /usuarios/registro
+POST  /usuarios/login
+GET   /usuarios/me
+PATCH /usuarios/me
 ```
 
-Actualmente existen las siguientes entidades principales:
+## Canchas
+
+```text
+GET  /canchas/
+POST /canchas/
+```
+
+## Reservas
+
+```text
+GET   /reservas/
+POST  /reservas/
+PATCH /reservas/{id}/cancelar
+GET   /reservas/disponibilidad
+```
+
+---
+
+# Modelo de datos
+
+Actualmente la base de datos contiene las siguientes entidades:
+
+```text
+usuarios
+    │
+    ├─────────────── reservas
+    │                    │
+    │                    ▼
+    │                 canchas
+    │
+    └─────────────── pedidos
+                         │
+                         ▼
+                  detalles_pedido
+                         │
+                         ▼
+                     productos
+```
+
+Tablas actuales:
 
 ```text
 usuarios
@@ -428,136 +483,211 @@ pedidos
 detalles_pedido
 ```
 
-Relaciones principales:
+---
+
+# Usuarios
+
+La tabla `usuarios` contiene información de autenticación y perfil.
+
+Principales campos:
 
 ```text
-Usuario
-   │
-   ├── Reservas
-   │       │
-   │       └── Cancha
-   │
-   └── Pedidos
-           │
-           └── DetallesPedido
-                    │
-                    └── Producto
+id
+nombre
+apellido
+email
+password_hash
+telefono
+rol
+fecha_registro
+```
+
+El campo `password_hash` almacena únicamente el hash de la contraseña.
+
+---
+
+# Canchas
+
+La tabla `canchas` contiene:
+
+```text
+id
+nombre
+tipo
+precio_hora
+capacidad
+estado
+```
+
+Actualmente existen canchas de:
+
+* Fútbol 5
+* Fútbol 8
+
+---
+
+# Productos
+
+El modelo de productos está preparado para la futura implementación de la tienda.
+
+Campos:
+
+```text
+id
+nombre
+descripcion
+precio
+stock
+categoria
+imagen
+estado
 ```
 
 ---
 
-# 🔄 Migraciones
+# Pedidos
 
-Las modificaciones estructurales de la base de datos se gestionan mediante **Alembic**.
+El modelo de pedidos permite relacionar una compra con un usuario.
 
-Para crear una migración:
+Campos principales:
+
+```text
+id
+usuario_id
+fecha
+total
+estado
+```
+
+Los productos individuales de cada pedido se almacenan en `detalles_pedido`.
+
+---
+
+# SQLAlchemy
+
+El proyecto utiliza SQLAlchemy como ORM.
+
+Esto permite trabajar con PostgreSQL desde modelos Python en lugar de escribir directamente todas las consultas SQL.
+
+La arquitectura mantiene separadas:
+
+```text
+Models
+Schemas
+Routers
+Database
+Security
+Services
+```
+
+Esto facilita el mantenimiento y la futura evolución del proyecto.
+
+---
+
+# Alembic
+
+Alembic se utiliza para controlar las migraciones de la base de datos.
+
+Inicialización:
+
+```bash
+alembic init migrations
+```
+
+Crear una migración:
 
 ```bash
 alembic revision --autogenerate -m "descripcion del cambio"
 ```
 
-Para aplicar las migraciones:
+Aplicar migraciones:
 
 ```bash
 alembic upgrade head
 ```
 
-Antes de aplicar una migración generada automáticamente, se debe revisar el archivo para verificar que los cambios sean correctos.
+Consultar estado:
+
+```bash
+alembic current
+```
+
+Consultar historial:
+
+```bash
+alembic history
+```
 
 ---
 
-# 🔒 Seguridad
+# Seguridad
 
 La seguridad es uno de los objetivos principales del proyecto.
 
-Actualmente se implementan:
+Actualmente se aplican:
 
 * Hash de contraseñas mediante Argon2.
-* Autenticación mediante JWT.
-* Variables de entorno para información sensible.
-* Separación entre modelos y schemas.
-* Validación de datos mediante Pydantic.
-* Control de acceso para las reservas.
-* Protección para que un usuario no pueda cancelar reservas de otro usuario.
-* `.env` excluido del repositorio mediante `.gitignore`.
+* JWT para autenticación.
+* Validación de datos con Pydantic.
+* Protección de endpoints mediante dependencias de FastAPI.
+* Protección de rutas en React.
+* Variables de entorno para secretos.
+* `.env` excluido de Git.
+* CORS configurado para el frontend.
+* Validación de propiedad de las reservas.
+* Validación de disponibilidad desde backend.
 
-Nunca se deben subir credenciales, contraseñas, tokens o claves secretas al repositorio.
-
----
-
-# 🚀 Instalación
-
-## Requisitos
-
-Antes de ejecutar el proyecto se necesita instalar:
-
-* Git
-* Node.js
-* npm
-* Python 3.11+
-* PostgreSQL
-
----
-
-# 📥 Clonar el repositorio
-
-```bash
-git clone https://github.com/juan2670/Golazo-react.git
-```
-
-Entrar al proyecto:
-
-```bash
-cd Golazo-react
-```
-
-Cambiar a la rama de desarrollo:
-
-```bash
-git checkout sebas
-```
-
----
-
-# 🖥️ Ejecutar el frontend
-
-Entrar en la carpeta:
-
-```bash
-cd frontend
-```
-
-Instalar dependencias:
-
-```bash
-npm install
-```
-
-Ejecutar el servidor:
-
-```bash
-npm run dev
-```
-
-La aplicación estará disponible normalmente en:
+No se deben almacenar:
 
 ```text
-http://localhost:5173
+Contraseñas en texto plano
+JWT_SECRET_KEY
+Credenciales de PostgreSQL
+Tokens
+Claves privadas
 ```
+
+dentro del repositorio.
 
 ---
 
-# 🐍 Ejecutar el backend
+# Variables de entorno
 
-Abrir otra terminal.
+El backend utiliza un archivo `.env`.
+
+Ejemplo:
+
+```env
+DATABASE_URL=postgresql+psycopg://usuario:password@localhost:5432/golazo_db
+
+JWT_SECRET_KEY=clave-secreta
+
+JWT_ALGORITHM=HS256
+
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES=60
+```
+
+El archivo `.env` está incluido en `.gitignore`.
+
+---
+
+# Instalación
+
+## Backend
 
 Entrar al backend:
 
-```bash
+```powershell
 cd backend
 ```
 
-Activar el entorno virtual en Windows:
+Crear entorno virtual:
+
+```powershell
+python -m venv venv
+```
+
+Activar:
 
 ```powershell
 .\venv\Scripts\Activate.ps1
@@ -565,29 +695,13 @@ Activar el entorno virtual en Windows:
 
 Instalar dependencias:
 
-```bash
+```powershell
 pip install -r requirements.txt
 ```
 
-Crear/configurar el archivo:
+Ejecutar:
 
-```text
-backend/.env
-```
-
-Ejemplo:
-
-```env
-DATABASE_URL=postgresql+psycopg://postgres:TU_PASSWORD@localhost:5432/golazo_db
-
-JWT_SECRET_KEY=TU_SECRET_KEY
-JWT_ALGORITHM=HS256
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES=60
-```
-
-Ejecutar FastAPI:
-
-```bash
+```powershell
 python -m uvicorn app.main:app --reload
 ```
 
@@ -597,207 +711,328 @@ API:
 http://127.0.0.1:8000
 ```
 
-Documentación interactiva:
+Documentación:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-Documentación alternativa:
+---
+
+# Frontend
+
+Entrar al frontend:
+
+```powershell
+cd frontend
+```
+
+Instalar dependencias:
+
+```powershell
+npm install
+```
+
+Ejecutar:
+
+```powershell
+npm run dev
+```
+
+Aplicación:
 
 ```text
-http://127.0.0.1:8000/redoc
+http://localhost:5173
 ```
 
 ---
 
-# 🧪 Pruebas rápidas
+# Base de datos
 
-Comprobar conexión con PostgreSQL:
+Base de datos utilizada durante el desarrollo:
 
-```bash
-python test_db.py
+```text
+golazo_db
 ```
 
-Comprobar los mappers de SQLAlchemy:
+Servidor:
 
-```bash
-python -c "from sqlalchemy.orm import configure_mappers; from app.models import *; configure_mappers(); print('Mappers configurados correctamente')"
+```text
+localhost
+```
+
+Puerto:
+
+```text
+5432
+```
+
+Motor:
+
+```text
+PostgreSQL
 ```
 
 ---
 
-# 🔀 Flujo de desarrollo
+# Carrito
 
-El desarrollo se realiza mediante ramas de Git.
+El frontend cuenta actualmente con un carrito funcional mediante `CartContext`.
 
-Rama principal:
+Permite:
+
+* Agregar productos.
+* Incrementar cantidades.
+* Disminuir cantidades.
+* Eliminar productos.
+* Vaciar carrito.
+* Calcular subtotal.
+* Calcular total.
+
+La tienda todavía utiliza productos definidos en el frontend y posteriormente será conectada con el backend y PostgreSQL.
+
+---
+
+# Diseño
+
+La identidad visual de Golazo está basada en una estética deportiva moderna.
+
+Características:
+
+* Fondo oscuro.
+* Blanco como color principal de texto.
+* Verde neón como color de acento.
+* Tipografía fuerte.
+* Bordes sutiles.
+* Componentes responsive.
+* Fotografías deportivas.
+* Animaciones y transiciones discretas.
+
+Paleta principal:
 
 ```text
-main
+Negro
+Blanco
+Verde neón
 ```
 
-Rama de desarrollo actual:
+---
+
+# Flujo actual de usuario
+
+```text
+                  ┌──────────────┐
+                  │    Inicio    │
+                  └──────┬───────┘
+                         │
+          ┌──────────────┼──────────────┐
+          ▼              ▼              ▼
+      Reservas         Tienda        Ubicación
+          │
+          ▼
+   ¿Autenticado?
+      │       │
+     NO      SÍ
+      │       │
+   /login     ▼
+           Reservar
+```
+
+Flujo de autenticación:
+
+```text
+Registro
+   │
+   ▼
+Login
+   │
+   ▼
+JWT
+   │
+   ▼
+AuthContext
+   │
+   ├── Navbar
+   ├── Perfil
+   └── Rutas protegidas
+```
+
+---
+
+# Próximos objetivos
+
+## Autenticación y usuarios
+
+* [x] Registro
+* [x] Login
+* [x] JWT
+* [x] Obtener usuario autenticado
+* [x] Logout
+* [x] Protección de rutas
+* [x] Perfil
+* [x] Editar perfil
+* [ ] Cambio de contraseña
+* [ ] Recuperación de contraseña
+* [ ] Mejoras de seguridad para producción
+
+## Reservas
+
+* [x] Listado de canchas
+* [x] Disponibilidad
+* [x] Creación de reservas
+* [x] Validación de conflictos
+* [x] Cancelación
+* [x] Historial
+* [x] Autenticación
+
+## Tienda
+
+* [x] Catálogo visual inicial
+* [x] Carrito
+* [ ] Productos desde PostgreSQL
+* [ ] API de productos
+* [ ] Detalle de producto
+* [ ] Stock real
+* [ ] Creación de pedidos
+* [ ] Historial de pedidos
+
+## Administración
+
+* [ ] Panel administrativo
+* [ ] Gestión de usuarios
+* [ ] Gestión de roles
+* [ ] Gestión de canchas
+* [ ] Gestión de reservas
+* [ ] Gestión de productos
+* [ ] Gestión de stock
+* [ ] Gestión de pedidos
+* [ ] Dashboard
+
+## Calidad
+
+* [ ] Pruebas unitarias
+* [ ] Pruebas de integración
+* [ ] Pruebas de API
+* [ ] Pruebas frontend
+* [ ] Manejo global de errores
+* [ ] Validaciones adicionales
+* [ ] Rate limiting
+* [ ] Auditoría de seguridad
+
+## Producción
+
+* [ ] Configuración de producción
+* [ ] HTTPS
+* [ ] Variables de entorno de producción
+* [ ] Base de datos de producción
+* [ ] Deploy del backend
+* [ ] Deploy del frontend
+* [ ] Dominio
+* [ ] Monitoreo
+
+---
+
+# Flujo de desarrollo
+
+El proyecto utiliza Git para controlar las versiones.
+
+Rama principal de desarrollo:
 
 ```text
 sebas
 ```
 
-Los cambios deben desarrollarse y probarse en la rama correspondiente antes de integrarse a `main`.
+Flujo recomendado:
 
-Para comprobar el estado:
-
-```bash
-git status
-```
-
-Agregar cambios:
-
-```bash
+```text
+Modificar
+   ↓
+Probar
+   ↓
+Corregir
+   ↓
+Verificar
+   ↓
 git add .
-```
-
-Crear commit:
-
-```bash
-git commit -m "descripcion del cambio"
-```
-
-Subir cambios:
-
-```bash
+   ↓
+git commit
+   ↓
 git push origin sebas
 ```
 
----
-
-# 🧩 Estado actual del proyecto
-
-## Frontend
-
-* [x] Estructura React + Vite
-* [x] Navegación con React Router
-* [x] Home
-* [x] Página de reservas
-* [x] Tienda
-* [x] Carrito
-* [x] Nosotros
-* [x] Ubicación
-* [x] Login
-* [x] Registro
-* [x] Diseño responsive inicial
-* [ ] Conectar reservas con API
-* [ ] Conectar tienda con API
-* [ ] Conectar autenticación con frontend
-* [ ] Perfil de usuario
-* [ ] Panel administrativo
-
-## Backend
-
-* [x] FastAPI
-* [x] PostgreSQL
-* [x] SQLAlchemy
-* [x] Alembic
-* [x] Modelos principales
-* [x] Schemas
-* [x] API de canchas
-* [x] Registro de usuarios
-* [x] Login
-* [x] Hash de contraseñas
-* [x] JWT
-* [x] Reservas
-* [x] Consulta de disponibilidad
-* [x] Cancelación de reservas
-* [ ] API de productos
-* [ ] API de pedidos
-* [ ] Roles y permisos administrativos avanzados
-* [ ] Pruebas automatizadas
-* [ ] Mejoras de validación de horarios
-* [ ] Integración completa con frontend
+La rama `main` no debe modificarse directamente durante el desarrollo.
 
 ---
 
-# 🛣️ Roadmap
+# Estado actual
 
-## Fase 1 — Base del proyecto
+Actualmente Golazo cuenta con una base funcional full-stack:
 
-* [x] Crear frontend React
-* [x] Crear backend FastAPI
-* [x] Configurar PostgreSQL
-* [x] Configurar SQLAlchemy
-* [x] Configurar Alembic
-* [x] Crear modelos principales
+```text
+React
+  ↓
+React Router
+  ↓
+AuthContext / CartContext
+  ↓
+Protected Routes
+  ↓
+FastAPI
+  ↓
+JWT + Argon2
+  ↓
+SQLAlchemy
+  ↓
+PostgreSQL
+```
 
-## Fase 2 — Usuarios y reservas
+Los principales flujos funcionales actualmente implementados son:
 
-* [x] Registro
-* [x] Login
-* [x] Hash de contraseñas
-* [x] JWT
-* [x] Crear reservas
-* [x] Consultar reservas
-* [x] Cancelar reservas
-* [x] Consultar disponibilidad
+```text
+Registro
+   ↓
+Login
+   ↓
+Autenticación JWT
+   ↓
+Navbar autenticado
+   ↓
+Perfil
+   ↓
+Edición de perfil
+```
 
-## Fase 3 — Integración
+y:
 
-* [ ] Conectar React con FastAPI
-* [ ] Autenticación desde React
-* [ ] Protección de rutas
-* [ ] Reservas utilizando datos reales
-* [ ] Disponibilidad en tiempo real
-* [ ] Manejo de errores
-* [ ] Estados de carga
+```text
+Login
+   ↓
+Reservas
+   ↓
+Consulta de disponibilidad
+   ↓
+Selección de cancha
+   ↓
+Reserva
+   ↓
+Cancelación
+   ↓
+Historial
+```
 
-## Fase 4 — Tienda
-
-* [ ] API de productos
-* [ ] CRUD de productos
-* [ ] Stock
-* [ ] Categorías
-* [ ] Pedidos
-* [ ] Detalles de pedidos
-* [ ] Integración carrito/backend
-
-## Fase 5 — Administración
-
-* [ ] Panel administrativo
-* [ ] Gestión de usuarios
-* [ ] Gestión de canchas
-* [ ] Gestión de reservas
-* [ ] Gestión de productos
-* [ ] Gestión de pedidos
-* [ ] Estadísticas
-
-## Fase 6 — Producción
-
-* [ ] Tests
-* [ ] Validaciones finales
-* [ ] Seguridad
-* [ ] Variables de entorno de producción
-* [ ] Configuración CORS
-* [ ] HTTPS
-* [ ] Deploy del frontend
-* [ ] Deploy del backend
-* [ ] Deploy de PostgreSQL
-* [ ] Monitoreo y logs
+El siguiente gran bloque de desarrollo será completar la **tienda conectada al backend**, seguido por el **panel administrativo**, pruebas y preparación para producción.
 
 ---
 
-# 👨‍💻 Autores
+# Autores
 
 **Sebastián Pérez**
+Ingeniería de Software
 
-Estudiante de Ingeniería de Software.
-
-**Juan José Jején**
-
-Estudiante de Ingeniería de Software.
+**Juan Jején**
 
 ---
 
-# 📄 Licencia
+## Golazo
 
-Este proyecto se encuentra actualmente en desarrollo académico.
-
-El uso, modificación y distribución del código queda sujeto a las condiciones definidas por los autores del proyecto.
+> **Juega. Reserva. Vive el fútbol.**
