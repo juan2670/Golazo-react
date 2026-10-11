@@ -25,16 +25,16 @@ El proyecto se encuentra en desarrollo activo.
 | Protección de rutas             | Implementado  |
 | Perfil de usuario               | Implementado  |
 | Edición de perfil               | Implementado  |
-| Tienda                          | En desarrollo |
+| Tienda                          | Implementado  |
 | Carrito                         | Implementado  |
-| Productos conectados al backend | Pendiente     |
-| Pedidos                         | Pendiente     |
+| Productos conectados al backend | Implementado  |
+| Pedidos                         | Implementado  |
 | Administración                  | Pendiente     |
 | PostgreSQL                      | Implementado  |
 | SQLAlchemy                      | Implementado  |
 | Alembic                         | Implementado  |
 | Validaciones backend            | Implementado  |
-| Pruebas automatizadas           | Pendiente     |
+| Pruebas automatizadas           | Implementado  |
 | Despliegue                      | Pendiente     |
 
 ---
@@ -437,8 +437,29 @@ PATCH /usuarios/me
 
 ```text
 GET  /canchas/
-POST /canchas/
+POST /canchas/          (solo administrador)
 ```
+
+## Productos
+
+```text
+GET   /productos/                 (opcional: ?categoria=Bebidas)
+GET   /productos/{id}
+POST  /productos/                 (solo administrador)
+PATCH /productos/{id}             (solo administrador)
+```
+
+## Pedidos
+
+```text
+GET   /pedidos/                   (pedidos del usuario autenticado)
+POST  /pedidos/                   {"items": [{"producto_id": 1, "cantidad": 2}]}
+PATCH /pedidos/{id}/cancelar      (solo pendientes; devuelve el stock)
+```
+
+El precio de cada producto lo toma el servidor de la base de datos, nunca del
+navegador. Un pedido valida que exista stock para todo antes de descontarlo:
+si falta un producto, no se crea nada.
 
 ## Reservas
 
@@ -665,9 +686,15 @@ JWT_SECRET_KEY=clave-secreta
 JWT_ALGORITHM=HS256
 
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES=60
+
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 ```
 
-El archivo `.env` está incluido en `.gitignore`.
+La plantilla completa está en `backend/.env.example`: cópiala como `.env` y
+completa los valores. El archivo `.env` está incluido en `.gitignore`.
+
+El frontend lee la URL de la API de `VITE_API_URL` (ver
+`frontend/.env.example`); si está vacía usa `http://127.0.0.1:8000`.
 
 ---
 
@@ -699,10 +726,29 @@ Instalar dependencias:
 pip install -r requirements.txt
 ```
 
+Crear las tablas (en una base nueva crea el esquema completo):
+
+```powershell
+alembic upgrade head
+```
+
+Cargar el catálogo inicial de la tienda (no duplica si ya existe):
+
+```powershell
+python -m app.seed
+```
+
 Ejecutar:
 
 ```powershell
 python -m uvicorn app.main:app --reload
+```
+
+Pruebas automatizadas (usan SQLite en memoria, no tocan PostgreSQL):
+
+```powershell
+pip install -r requirements-dev.txt
+python -m pytest
 ```
 
 API:
@@ -788,8 +834,12 @@ Permite:
 * Vaciar carrito.
 * Calcular subtotal.
 * Calcular total.
+* Guardarse en el navegador (no se pierde al recargar).
+* Confirmar la compra: crea un pedido en el backend (requiere iniciar sesión).
 
-La tienda todavía utiliza productos definidos en el frontend y posteriormente será conectada con el backend y PostgreSQL.
+La tienda carga los productos desde `/productos/`. Si el servidor no responde,
+muestra el catálogo de referencia con un aviso, pero para comprar se necesita
+conexión. Los pedidos del usuario se ven y se pueden cancelar desde el perfil.
 
 ---
 
