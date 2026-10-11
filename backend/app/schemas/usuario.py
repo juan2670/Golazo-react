@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UsuarioCreate(BaseModel):
@@ -17,8 +17,7 @@ class UsuarioResponse(BaseModel):
     telefono: str | None
     rol: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UsuarioUpdate(BaseModel):

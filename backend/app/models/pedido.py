@@ -6,6 +6,7 @@ from sqlalchemy import DateTime, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.models._tiempo import ahora_utc
 
 if TYPE_CHECKING:
     from app.models.detalle_pedido import DetallePedido
@@ -27,7 +28,7 @@ class Pedido(Base):
 
     fecha: Mapped[datetime] = mapped_column(
         DateTime,
-        default=datetime.utcnow,
+        default=ahora_utc,
         nullable=False,
     )
 

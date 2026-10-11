@@ -14,13 +14,6 @@ from app.schemas.usuario import (
     UsuarioCreate,
     UsuarioLogin,
     UsuarioResponse,
-)
-
-from app.schemas.usuario import (
-    TokenResponse,
-    UsuarioCreate,
-    UsuarioLogin,
-    UsuarioResponse,
     UsuarioUpdate,
 )
 
