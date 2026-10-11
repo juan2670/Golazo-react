@@ -1,4 +1,6 @@
-const API_URL = "http://127.0.0.1:8000";
+// En producción se define VITE_API_URL (ver .env.example); en desarrollo se
+// usa el backend local.
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem("golazo_token");
@@ -12,10 +14,22 @@ async function request(endpoint, options = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  let response;
+
+  try {
+    response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    // fetch solo falla así cuando no hay respuesta del servidor
+    // (antes llegaba al usuario como "Failed to fetch").
+    const sinConexion = new Error(
+      "No pudimos conectarnos con el servidor. Revisa tu conexión e inténtalo de nuevo.",
+    );
+    sinConexion.status = 0;
+    throw sinConexion;
+  }
 
   let data = null;
 
@@ -26,11 +40,19 @@ async function request(endpoint, options = {}) {
   }
 
   if (!response.ok) {
+    // Los errores de validación (422) traen una lista, no un texto.
     const message =
-      data?.detail ||
-      "Ocurrió un error al comunicarse con el servidor.";
+      typeof data?.detail === "string"
+        ? data.detail
+        : Array.isArray(data?.detail)
+          ? "Revisa los datos ingresados e inténtalo de nuevo."
+          : "Ocurrió un error al comunicarse con el servidor.";
 
-    throw new Error(message);
+    // El código permite distinguir una sesión inválida (401) de un fallo
+    // temporal del servidor.
+    const error = new Error(message);
+    error.status = response.status;
+    throw error;
   }
 
   return data;

@@ -1,0 +1,110 @@
+// =====================================================
+// Movimiento de la interfaz
+// Reglas: ease-out en las entradas, menos de 300 ms, solo transform y
+// opacity, y siempre interrumpible (transiciones CSS, no keyframes).
+// =====================================================
+
+// ---------- Presionar: el botón se hunde un poco ----------
+// La duración (140 ms) viene de $btn-transition en _variables.scss.
+
+.btn:active:not(:disabled):not(.disabled) {
+  transform: scale(0.97);
+}
+
+// El botón deportivo ya está inclinado: se conserva la inclinación.
+.btn-sport:active:not(:disabled):not(.disabled) {
+  transform: skewX(-10deg) scale(0.97);
+}
+
+.video-tile {
+  transition: transform 0.14s var(--ease-out);
+
+  &:active {
+    transform: scale(0.985);
+  }
+}
+
+// ---------- Avisos (errores y confirmaciones) ----------
+// Aparecen bajando 6 px en vez de saltar a la vista.
+
+.alert {
+  transition:
+    opacity 0.2s var(--ease-out),
+    transform 0.2s var(--ease-out);
+}
+
+@starting-style {
+  .alert {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+// ---------- Contenido que cambia (Perfil, Reservas, Tienda) ----------
+// .entra: el elemento entra subiendo 8 px. Va en un elemento interno, nunca
+// en uno que anime Reveal con GSAP, para que no peleen por las mismas
+// propiedades.
+
+.entra {
+  transition:
+    opacity 0.2s var(--ease-out),
+    transform 0.2s var(--ease-out);
+}
+
+@starting-style {
+  .entra {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+// Versión corta para el filtro de la tienda, que se usa seguido:
+// solo opacidad, sin desplazamiento.
+.entra--suave {
+  transition: opacity 0.15s var(--ease-out);
+}
+
+@starting-style {
+  .entra--suave {
+    transform: none;
+  }
+}
+
+// ---------- Menú lateral ----------
+// Curva de cajón: arranca rápido y se asienta suave.
+
+.offcanvas,
+.offcanvas-xl {
+  --bs-offcanvas-transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+// ---------- Movimiento reducido ----------
+// Más suave, no ausente: se mantiene la respuesta con opacidad.
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:active:not(:disabled):not(.disabled) {
+    transform: none;
+    opacity: 0.85;
+  }
+
+  .btn-sport:active:not(:disabled):not(.disabled) {
+    transform: skewX(-10deg);
+  }
+
+  .video-tile:active {
+    transform: none;
+    opacity: 0.85;
+  }
+
+  .alert,
+  .entra {
+    transition: opacity 0.2s var(--ease-out);
+  }
+
+  @starting-style {
+    .alert,
+    .entra {
+      transform: none;
+    }
+  }
+}

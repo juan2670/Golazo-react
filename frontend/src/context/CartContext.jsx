@@ -1,9 +1,31 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 const CartContext = createContext()
 
+const STORAGE_KEY = 'golazo_carrito'
+
+// El carrito se guarda en el navegador: no se pierde al recargar ni al ir a
+// iniciar sesión en medio de una compra.
+function leerCarritoGuardado() {
+  try {
+    const guardado = JSON.parse(localStorage.getItem(STORAGE_KEY))
+
+    return Array.isArray(guardado) ? guardado : []
+  } catch {
+    return []
+  }
+}
+
 export function CartProvider({ children }) {
-  const [carrito, setCarrito] = useState([])
+  const [carrito, setCarrito] = useState(leerCarritoGuardado)
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(carrito))
+    } catch {
+      // sin almacenamiento disponible: el carrito sigue funcionando en memoria
+    }
+  }, [carrito])
 
   const agregarAlCarrito = (producto) => {
     setCarrito((carritoActual) => {

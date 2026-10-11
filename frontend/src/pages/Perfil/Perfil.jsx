@@ -1,10 +1,34 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Container,
+  FloatingLabel,
+  Form,
+  Row,
+  Spinner,
+} from 'react-bootstrap'
 
+import Reveal from '../../components/Reveal/Reveal'
+import SplitHeading from '../../components/SplitHeading/SplitHeading'
 import { useAuth } from '../../context/AuthContext'
 import { api } from '../../services/api'
 
-import './Perfil.css'
+import MisPedidos from './MisPedidos'
+
+function Dato({ etiqueta, valor }) {
+  return (
+    <Col sm={6}>
+      <div className="border-bottom pb-3">
+        <small className="text-body-secondary d-block fw-bold">{etiqueta}</small>
+        <strong className="text-break">{valor}</strong>
+      </div>
+    </Col>
+  )
+}
 
 function Perfil() {
   const navigate = useNavigate()
@@ -98,207 +122,180 @@ function Perfil() {
 
   if (loading) {
     return (
-      <section className="perfil">
-        <div className="perfil__loading">
-          Cargando perfil...
-        </div>
+      <section className="min-vh-page d-flex align-items-center justify-content-center gap-3 text-body-secondary">
+        <Spinner animation="border" size="sm" />
+        Cargando perfil…
       </section>
     )
   }
 
   if (error && !usuario) {
     return (
-      <section className="perfil">
-        <div className="perfil__error">
-          <p>{error}</p>
+      <section className="min-vh-page d-flex flex-column align-items-center justify-content-center gap-3">
+        <Alert variant="danger" className="mb-0">
+          {error}
+        </Alert>
 
-          <button onClick={() => navigate('/login')}>
-            Iniciar sesión
-          </button>
-        </div>
+        <Button variant="primary" onClick={() => navigate('/login')}>
+          Iniciar sesión
+        </Button>
       </section>
     )
   }
 
   return (
-    <section className="perfil">
-      <div className="perfil__header">
-        <p>GOLAZO</p>
+    <section className="bg-body-tertiary min-vh-page py-6">
+      <Container style={{ maxWidth: '52rem' }}>
+        <header className="mb-5">
+          <SplitHeading as="h1" className="display-5" alEntrar={false}>
+            Mi perfil
+          </SplitHeading>
 
-        <h1>Mi perfil.</h1>
+          <p className="lead text-body-secondary mt-3 mb-0">
+            Administra tu información y consulta los datos de tu cuenta.
+          </p>
+        </header>
 
-        <span>
-          Administra tu información y consulta los datos de tu cuenta.
-        </span>
-      </div>
-
-      <div className="perfil__content">
-
-        <div className="perfil__card">
-          <div className="perfil__avatar">
-            {usuario.nombre.charAt(0).toUpperCase()}
-          </div>
-
-          <div className="perfil__identity">
-            <h2>
-              {usuario.nombre} {usuario.apellido}
-            </h2>
-
-            <span>{usuario.rol}</span>
-          </div>
-        </div>
-
-        <div className="perfil__card">
-
-          <div className="perfil__card-header">
-            <div>
-              <p>INFORMACIÓN PERSONAL</p>
-              <h2>Datos de la cuenta</h2>
-            </div>
-
-            {!editando && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMensaje('')
-                  setError('')
-                  setEditando(true)
+        <Reveal className="d-grid gap-4" stagger={0.12} y={24}>
+          <Card className="border-0 shadow-sm">
+            <Card.Body className="d-flex align-items-center gap-3 p-4">
+              <div
+                className="rounded-circle d-grid place-items-center text-dark font-display fs-2 flex-shrink-0"
+                style={{
+                  width: '4.5rem',
+                  height: '4.5rem',
+                  placeItems: 'center',
+                  background: 'linear-gradient(135deg, var(--gl-grass), var(--gl-cyan))',
                 }}
               >
-                Editar
-              </button>
-            )}
-          </div>
-
-          {editando ? (
-            <form
-              className="perfil__form"
-              onSubmit={handleGuardar}
-            >
-              <div className="perfil__field">
-                <label htmlFor="nombre">
-                  Nombre
-                </label>
-
-                <input
-                  id="nombre"
-                  name="nombre"
-                  type="text"
-                  value={formulario.nombre}
-                  onChange={handleChange}
-                  required
-                  minLength={2}
-                  maxLength={100}
-                />
+                {usuario.nombre.charAt(0).toUpperCase()}
               </div>
 
-              <div className="perfil__field">
-                <label htmlFor="apellido">
-                  Apellido
-                </label>
+              <div>
+                <h2 className="h3 mb-0">
+                  {usuario.nombre} {usuario.apellido}
+                </h2>
 
-                <input
-                  id="apellido"
-                  name="apellido"
-                  type="text"
-                  value={formulario.apellido}
-                  onChange={handleChange}
-                  required
-                  minLength={2}
-                  maxLength={100}
-                />
+                <small className="text-success fw-bold text-uppercase">
+                  {usuario.rol}
+                </small>
+              </div>
+            </Card.Body>
+          </Card>
+
+          <Card className="border-0 shadow-sm">
+            <Card.Body className="p-4 p-md-5">
+              <div className="d-flex justify-content-between align-items-start gap-3 mb-4">
+                <h2 className="h3 mb-0">Datos de la cuenta</h2>
+
+                {!editando && (
+                  <Button
+                    type="button"
+                    variant="outline-primary"
+                    size="sm"
+                    onClick={() => {
+                      setMensaje('')
+                      setError('')
+                      setEditando(true)
+                    }}
+                  >
+                    Editar
+                  </Button>
+                )}
               </div>
 
-              <div className="perfil__field">
-                <label htmlFor="telefono">
-                  Teléfono
-                </label>
+              {editando ? (
+                <Form onSubmit={handleGuardar} className="entra">
+                  <div className="d-grid gap-3">
+                    <FloatingLabel controlId="nombre" label="Nombre">
+                      <Form.Control
+                        name="nombre"
+                        type="text"
+                        placeholder="Nombre"
+                        value={formulario.nombre}
+                        onChange={handleChange}
+                        required
+                        minLength={2}
+                        maxLength={100}
+                      />
+                    </FloatingLabel>
 
-                <input
-                  id="telefono"
-                  name="telefono"
-                  type="text"
-                  value={formulario.telefono}
-                  onChange={handleChange}
-                  maxLength={20}
-                />
-              </div>
+                    <FloatingLabel controlId="apellido" label="Apellido">
+                      <Form.Control
+                        name="apellido"
+                        type="text"
+                        placeholder="Apellido"
+                        value={formulario.apellido}
+                        onChange={handleChange}
+                        required
+                        minLength={2}
+                        maxLength={100}
+                      />
+                    </FloatingLabel>
 
-              {error && (
-                <p className="perfil__form-error">
-                  {error}
-                </p>
+                    <FloatingLabel controlId="telefono" label="Teléfono">
+                      <Form.Control
+                        name="telefono"
+                        type="text"
+                        placeholder="Teléfono"
+                        value={formulario.telefono}
+                        onChange={handleChange}
+                        maxLength={20}
+                      />
+                    </FloatingLabel>
+                  </div>
+
+                  {error && (
+                    <Alert variant="danger" className="mt-3 mb-0 py-2">
+                      {error}
+                    </Alert>
+                  )}
+
+                  <div className="d-flex justify-content-end gap-2 mt-4">
+                    <Button
+                      type="button"
+                      variant="outline-secondary"
+                      onClick={handleCancelar}
+                      disabled={guardando}
+                    >
+                      Cancelar
+                    </Button>
+
+                    <Button type="submit" variant="primary" disabled={guardando}>
+                      {guardando ? 'Guardando…' : 'Guardar cambios'}
+                    </Button>
+                  </div>
+                </Form>
+              ) : (
+                <Row className="g-4 entra">
+                  <Dato etiqueta="Nombre" valor={usuario.nombre} />
+                  <Dato etiqueta="Apellido" valor={usuario.apellido} />
+                  <Dato etiqueta="Correo electrónico" valor={usuario.email} />
+                  <Dato
+                    etiqueta="Teléfono"
+                    valor={usuario.telefono || 'No registrado'}
+                  />
+                  <Dato etiqueta="Rol" valor={usuario.rol} />
+                </Row>
               )}
+            </Card.Body>
+          </Card>
 
-              <div className="perfil__form-actions">
-                <button
-                  type="button"
-                  onClick={handleCancelar}
-                  disabled={guardando}
-                >
-                  Cancelar
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={guardando}
-                >
-                  {guardando
-                    ? 'Guardando...'
-                    : 'Guardar cambios'}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="perfil__data">
-
-              <div className="perfil__field">
-                <span>Nombre</span>
-                <strong>{usuario.nombre}</strong>
-              </div>
-
-              <div className="perfil__field">
-                <span>Apellido</span>
-                <strong>{usuario.apellido}</strong>
-              </div>
-
-              <div className="perfil__field">
-                <span>Correo electrónico</span>
-                <strong>{usuario.email}</strong>
-              </div>
-
-              <div className="perfil__field">
-                <span>Teléfono</span>
-                <strong>
-                  {usuario.telefono || 'No registrado'}
-                </strong>
-              </div>
-
-              <div className="perfil__field">
-                <span>Rol</span>
-                <strong>{usuario.rol}</strong>
-              </div>
-
-            </div>
+          {mensaje && (
+            <Alert variant="success" className="mb-0">
+              {mensaje}
+            </Alert>
           )}
-        </div>
 
-        {mensaje && (
-          <div className="perfil__success">
-            {mensaje}
+          <MisPedidos />
+
+          <div>
+            <Button variant="outline-danger" onClick={logout}>
+              Cerrar sesión
+            </Button>
           </div>
-        )}
-
-        <div className="perfil__actions">
-          <button
-            className="perfil__logout"
-            onClick={logout}
-          >
-            Cerrar sesión
-          </button>
-        </div>
-
-      </div>
+        </Reveal>
+      </Container>
     </section>
   )
 }

@@ -30,8 +30,13 @@ export function AuthProvider({ children }) {
         const data = await api.get('/usuarios/me')
 
         setUsuario(data)
-      } catch {
-        localStorage.removeItem('golazo_token')
+      } catch (error) {
+        // Solo un token rechazado cierra la sesión. Si el servidor no
+        // responde, el token se conserva y basta recargar cuando vuelva.
+        if (error.status === 401 || error.status === 403) {
+          localStorage.removeItem('golazo_token')
+        }
+
         setUsuario(null)
       } finally {
         setLoading(false)

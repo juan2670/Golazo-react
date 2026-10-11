@@ -1,8 +1,70 @@
 import { useEffect, useState } from 'react'
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Col,
+  Collapse,
+  Container,
+  FloatingLabel,
+  Form,
+  Modal,
+  Row,
+  Spinner,
+} from 'react-bootstrap'
 
+import Reveal from '../../components/Reveal/Reveal'
+import SplitHeading from '../../components/SplitHeading/SplitHeading'
 import { api } from '../../services/api'
 
-import './Reservas.css'
+function TarjetaReserva({ reserva, cancelada = false, cancelando, alCancelar }) {
+  return (
+    <Card
+      className={`border-0 shadow-sm border-start border-5 ${
+        cancelada ? 'border-secondary opacity-75' : 'border-success'
+      }`}
+    >
+      <Card.Body className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 entra">
+        <div>
+          <small className="text-success fw-bold">Reserva #{reserva.id}</small>
+
+          <h3 className="h4 my-1">Cancha {reserva.cancha_id}</h3>
+
+          <p className="text-body-secondary mb-0">
+            {reserva.fecha} · {reserva.hora_inicio.slice(0, 5)} -{' '}
+            {reserva.hora_fin.slice(0, 5)}
+          </p>
+        </div>
+
+        <div className="d-flex flex-wrap align-items-center gap-3">
+          <strong className="fs-5">
+            ${Number(reserva.total).toLocaleString('es-CO')}
+          </strong>
+
+          <Badge
+            bg={cancelada ? 'secondary' : 'success'}
+            className="text-uppercase"
+          >
+            {cancelada ? 'cancelada' : reserva.estado}
+          </Badge>
+
+          {!cancelada && (
+            <Button
+              type="button"
+              variant="outline-danger"
+              size="sm"
+              disabled={cancelando}
+              onClick={alCancelar}
+            >
+              {cancelando ? 'Cancelando…' : 'Cancelar reserva'}
+            </Button>
+          )}
+        </div>
+      </Card.Body>
+    </Card>
+  )
+}
 
 function Reservas() {
   const [canchas, setCanchas] = useState([])
@@ -22,6 +84,7 @@ function Reservas() {
   const [misReservas, setMisReservas] = useState([])
   const [cargandoReservas, setCargandoReservas] = useState(true)
   const [cancelandoId, setCancelandoId] = useState(null)
+  const [reservaPorCancelar, setReservaPorCancelar] = useState(null)
   const [mostrarHistorial, setMostrarHistorial] = useState(false)
 
   const canchaSeleccionada = canchas.find(
@@ -168,7 +231,7 @@ function Reservas() {
       })
 
       setMensaje(
-        `Reserva creada correctamente. Cancha: ${canchaSeleccionada.nombre}, ${reserva.fecha} de ${reserva.hora_inicio} a ${reserva.hora_fin}.`,
+        `Reserva creada correctamente. Cancha: ${canchaSeleccionada.nombre}, ${reserva.fecha} de ${reserva.hora_inicio.slice(0, 5)} a ${reserva.hora_fin.slice(0, 5)}.`,
       )
 
       setHora('')
@@ -196,13 +259,7 @@ function Reservas() {
   // =====================================================
 
   const handleCancelar = async (reservaId) => {
-    const confirmar = window.confirm(
-      '¿Estás seguro de que quieres cancelar esta reserva?',
-    )
-
-    if (!confirmar) {
-      return
-    }
+    setReservaPorCancelar(null)
 
     try {
       setCancelandoId(reservaId)
@@ -268,356 +325,247 @@ function Reservas() {
   // =====================================================
 
   return (
-    <section className="reservas">
-      {/* =================================================
-          HEADER
-      ================================================== */}
+    <section className="bg-body-tertiary min-vh-page py-6">
+      <Container style={{ maxWidth: '64rem' }}>
+        <header className="mb-5">
+          <SplitHeading as="h1" className="display-5" alEntrar={false}>
+            Reserva tu cancha
+          </SplitHeading>
 
-      <div className="reservas__header">
-        <p>RESERVAS</p>
+          <p className="lead text-body-secondary mt-3 mb-0">
+            Elige la cancha, fecha y horario para organizar tu próximo partido.
+          </p>
+        </header>
 
-        <h1>Reserva tu cancha</h1>
+        <Reveal>
+          <Form onSubmit={handleSubmit}>
+            <Card className="border-0 shadow">
+              <Card.Body className="p-4 p-md-5">
+                <h2 className="h3 mb-4">Encuentra tu horario</h2>
 
-        <span>
-          Elige la cancha, fecha y horario para organizar
-          tu próximo partido.
-        </span>
-      </div>
+                <Row className="g-3">
+                  <Col md={6}>
+                    <FloatingLabel controlId="cancha" label="Cancha">
+                      <Form.Select
+                        value={canchaId}
+                        onChange={(event) => {
+                          setCanchaId(event.target.value)
+                          setHora('')
+                          setMensaje('')
+                          setError('')
+                        }}
+                        disabled={cargandoCanchas}
+                      >
+                        <option value="">
+                          {cargandoCanchas
+                            ? 'Cargando canchas…'
+                            : 'Selecciona una cancha'}
+                        </option>
 
-      <div className="reservas__content">
-        {/* =================================================
-            FORMULARIO
-        ================================================== */}
+                        {canchas.map((cancha) => (
+                          <option key={cancha.id} value={cancha.id}>
+                            {cancha.nombre} — {cancha.tipo}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </FloatingLabel>
+                  </Col>
 
-        <form
-          className="reservas__card"
-          onSubmit={handleSubmit}
-        >
-          <h2>Encuentra tu horario</h2>
+                  <Col md={6}>
+                    <FloatingLabel controlId="fecha" label="Fecha">
+                      <Form.Control
+                        type="date"
+                        value={fecha}
+                        min={fechaMinima}
+                        onChange={(event) => {
+                          setFecha(event.target.value)
+                          setMensaje('')
+                          setError('')
+                        }}
+                      />
+                    </FloatingLabel>
+                  </Col>
 
-          <div className="reservas__form">
-            {/* CANCHA */}
+                  <Col md={6}>
+                    <FloatingLabel controlId="hora" label="Hora">
+                      <Form.Select
+                        value={hora}
+                        onChange={(event) => {
+                          setHora(event.target.value)
+                          setMensaje('')
+                          setError('')
+                        }}
+                        disabled={!canchaId || !fecha || cargandoHorarios}
+                      >
+                        <option value="">
+                          {cargandoHorarios
+                            ? 'Consultando disponibilidad…'
+                            : 'Selecciona una hora'}
+                        </option>
 
-            <div className="form__group">
-              <label htmlFor="cancha">
-                Cancha
-              </label>
+                        {horariosDisponibles.map((horario) => (
+                          <option
+                            key={horario.hora_inicio}
+                            value={horario.hora_inicio}
+                          >
+                            {horario.hora_inicio}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </FloatingLabel>
+                  </Col>
 
-              <select
-                id="cancha"
-                value={canchaId}
-                onChange={(event) => {
-                  setCanchaId(event.target.value)
-                  setHora('')
-                  setMensaje('')
-                  setError('')
-                }}
-                disabled={cargandoCanchas}
-              >
-                <option value="">
-                  {cargandoCanchas
-                    ? 'Cargando canchas...'
-                    : 'Selecciona una cancha'}
-                </option>
+                  <Col md={6}>
+                    <FloatingLabel controlId="duracion" label="Duración">
+                      <Form.Select
+                        value={duracion}
+                        onChange={(event) => {
+                          setDuracion(event.target.value)
+                          setHora('')
+                          setMensaje('')
+                          setError('')
+                        }}
+                      >
+                        <option value="1">1 hora</option>
+                        <option value="2">2 horas</option>
+                      </Form.Select>
+                    </FloatingLabel>
+                  </Col>
+                </Row>
 
-                {canchas.map((cancha) => (
-                  <option
-                    key={cancha.id}
-                    value={cancha.id}
-                  >
-                    {cancha.nombre} — {cancha.tipo}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <div className="d-flex justify-content-between align-items-baseline border-top mt-4 pt-4">
+                  <span className="text-body-secondary fw-bold">
+                    Total estimado
+                  </span>
 
-            {/* FECHA */}
+                  <strong className="font-display fs-2 text-success">
+                    ${totalEstimado.toLocaleString('es-CO')}
+                  </strong>
+                </div>
 
-            <div className="form__group">
-              <label htmlFor="fecha">
-                Fecha
-              </label>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  className="w-100 mt-4"
+                  disabled={reservando}
+                >
+                  {reservando ? 'Creando reserva…' : 'Continuar con la reserva'}
+                </Button>
 
-              <input
-                id="fecha"
-                type="date"
-                value={fecha}
-                min={fechaMinima}
-                onChange={(event) => {
-                  setFecha(event.target.value)
-                  setMensaje('')
-                  setError('')
-                }}
-              />
-            </div>
+                {error && (
+                  <Alert variant="danger" className="mt-3 mb-0">
+                    {error}
+                  </Alert>
+                )}
 
-            {/* HORA */}
+                {mensaje && (
+                  <Alert variant="success" className="mt-3 mb-0">
+                    {mensaje}
+                  </Alert>
+                )}
+              </Card.Body>
+            </Card>
+          </Form>
+        </Reveal>
 
-            <div className="form__group">
-              <label htmlFor="hora">
-                Hora
-              </label>
+        {/* ================= MIS RESERVAS ================= */}
 
-              <select
-                id="hora"
-                value={hora}
-                onChange={(event) => {
-                  setHora(event.target.value)
-                  setMensaje('')
-                  setError('')
-                }}
-                disabled={
-                  !canchaId ||
-                  !fecha ||
-                  cargandoHorarios
-                }
-              >
-                <option value="">
-                  {cargandoHorarios
-                    ? 'Consultando disponibilidad...'
-                    : 'Selecciona una hora'}
-                </option>
-
-                {horariosDisponibles.map((horario) => (
-                  <option
-                    key={horario.hora_inicio}
-                    value={horario.hora_inicio}
-                  >
-                    {horario.hora_inicio}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* DURACIÓN */}
-
-            <div className="form__group">
-              <label htmlFor="duracion">
-                Duración
-              </label>
-
-              <select
-                id="duracion"
-                value={duracion}
-                onChange={(event) => {
-                  setDuracion(event.target.value)
-                  setHora('')
-                  setMensaje('')
-                  setError('')
-                }}
-              >
-                <option value="1">
-                  1 hora
-                </option>
-
-                <option value="2">
-                  2 horas
-                </option>
-              </select>
-            </div>
-          </div>
-
-          {/* TOTAL */}
-
-          <div className="reservas__summary">
-            <span>
-              Total estimado
-            </span>
-
-            <strong>
-              ${totalEstimado.toLocaleString('es-CO')}
-            </strong>
-          </div>
-
-          {/* BOTÓN */}
-
-          <button
-            type="submit"
-            disabled={reservando}
-          >
-            {reservando
-              ? 'Creando reserva...'
-              : 'Continuar con la reserva'}
-          </button>
-
-          {/* ERROR */}
-
-          {error && (
-            <p className="reservas__message reservas__message--error">
-              {error}
-            </p>
-          )}
-
-          {/* MENSAJE */}
-
-          {mensaje && (
-            <p className="reservas__message reservas__message--success">
-              {mensaje}
-            </p>
-          )}
-        </form>
-
-        {/* =================================================
-            MIS RESERVAS
-        ================================================== */}
-
-        <div className="reservas__mis-reservas">
-          <div className="reservas__mis-reservas-header">
-            <p>MIS RESERVAS</p>
-
-            <h2>Próximos partidos</h2>
-          </div>
-
-          {/* RESERVAS ACTIVAS */}
+        <section className="mt-6" aria-labelledby="mis-reservas">
+          <h2 id="mis-reservas" className="display-6 mb-4">
+            Próximos partidos
+          </h2>
 
           {cargandoReservas ? (
-            <p className="reservas__message">
-              Cargando tus reservas...
-            </p>
+            <div className="d-flex align-items-center gap-3 text-body-secondary">
+              <Spinner animation="border" size="sm" />
+              Cargando tus reservas…
+            </div>
           ) : reservasActivas.length === 0 ? (
-            <div className="reservas__empty">
-              <span>
-                NO TIENES RESERVAS ACTIVAS
-              </span>
+            <div className="border border-2 border-dashed rounded-3 bg-body p-5 text-center">
+              <p className="fw-bold mb-1">No tienes reservas activas</p>
 
-              <p>
-                Cuando reserves una cancha,
-                aparecerá aquí.
+              <p className="text-body-secondary mb-0">
+                Cuando reserves una cancha, aparecerá aquí.
               </p>
             </div>
           ) : (
-            <div className="reservas__list">
+            <Reveal className="d-grid gap-3" stagger={0.1} y={24}>
               {reservasActivas.map((reserva) => (
-                <article
-                  className="reserva__item"
+                <TarjetaReserva
                   key={reserva.id}
-                >
-                  <div className="reserva__info">
-                    <span>
-                      RESERVA #{reserva.id}
-                    </span>
-
-                    <h3>
-                      Cancha {reserva.cancha_id}
-                    </h3>
-
-                    <p>
-                      {reserva.fecha}
-                    </p>
-
-                    <p>
-                      {reserva.hora_inicio.slice(0, 5)}
-                      {' - '}
-                      {reserva.hora_fin.slice(0, 5)}
-                    </p>
-                  </div>
-
-                  <div className="reserva__details">
-                    <strong>
-                      $
-                      {Number(reserva.total).toLocaleString(
-                        'es-CO',
-                      )}
-                    </strong>
-
-                    <span
-                      className={`reserva__estado reserva__estado--${reserva.estado}`}
-                    >
-                      {reserva.estado}
-                    </span>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleCancelar(reserva.id)
-                      }
-                      disabled={
-                        cancelandoId === reserva.id
-                      }
-                    >
-                      {cancelandoId === reserva.id
-                        ? 'Cancelando...'
-                        : 'Cancelar reserva'}
-                    </button>
-                  </div>
-                </article>
+                  reserva={reserva}
+                  cancelando={cancelandoId === reserva.id}
+                  alCancelar={() => setReservaPorCancelar(reserva.id)}
+                />
               ))}
-            </div>
+            </Reveal>
           )}
-
-          {/* =================================================
-              HISTORIAL
-          ================================================== */}
 
           {reservasCanceladas.length > 0 && (
-            <div className="reservas__historial">
-              <button
+            <div className="mt-5 border-top pt-3">
+              <Button
                 type="button"
-                className="reservas__historial-toggle"
-                onClick={() =>
-                  setMostrarHistorial(
-                    !mostrarHistorial,
-                  )
-                }
+                variant="link"
+                className="text-body-secondary px-0 fw-bold text-decoration-none"
+                aria-expanded={mostrarHistorial}
+                aria-controls="historial-reservas"
+                onClick={() => setMostrarHistorial(!mostrarHistorial)}
               >
-                <span>
-                  HISTORIAL DE RESERVAS
-                </span>
+                Historial de reservas ({reservasCanceladas.length}){' '}
+                {mostrarHistorial ? '−' : '+'}
+              </Button>
 
-                <span className="reservas__historial-arrow">
-                  {mostrarHistorial ? '−' : '+'}
-                </span>
-              </button>
-
-              {mostrarHistorial && (
-                <div className="reservas__list reservas__list--historial">
-                  {reservasCanceladas.map(
-                    (reserva) => (
-                      <article
-                        className="reserva__item reserva__item--cancelada"
+              <Collapse in={mostrarHistorial}>
+                <div id="historial-reservas">
+                  <div className="d-grid gap-3 pt-3">
+                    {reservasCanceladas.map((reserva) => (
+                      <TarjetaReserva
                         key={reserva.id}
-                      >
-                        <div className="reserva__info">
-                          <span>
-                            RESERVA #{reserva.id}
-                          </span>
-
-                          <h3>
-                            Cancha {reserva.cancha_id}
-                          </h3>
-
-                          <p>
-                            {reserva.fecha}
-                          </p>
-
-                          <p>
-                            {reserva.hora_inicio.slice(0, 5)}
-                            {' - '}
-                            {reserva.hora_fin.slice(0, 5)}
-                          </p>
-                        </div>
-
-                        <div className="reserva__details">
-                          <strong>
-                            $
-                            {Number(
-                              reserva.total,
-                            ).toLocaleString('es-CO')}
-                          </strong>
-
-                          <span className="reserva__estado reserva__estado--cancelada">
-                            cancelada
-                          </span>
-                        </div>
-                      </article>
-                    ),
-                  )}
+                        reserva={reserva}
+                        cancelada
+                      />
+                    ))}
+                  </div>
                 </div>
-              )}
+              </Collapse>
             </div>
           )}
-        </div>
-      </div>
+        </section>
+      </Container>
+
+      <Modal
+        show={reservaPorCancelar !== null}
+        onHide={() => setReservaPorCancelar(null)}
+        centered
+      >
+        <Modal.Header closeButton closeLabel="Cerrar">
+          <Modal.Title as="h2" className="h4">
+            Cancelar reserva
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          ¿Seguro que quieres cancelar la reserva #{reservaPorCancelar}? Esta
+          acción libera el horario para otras personas.
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setReservaPorCancelar(null)}
+          >
+            Mantener reserva
+          </Button>
+
+          <Button
+            variant="danger"
+            onClick={() => handleCancelar(reservaPorCancelar)}
+          >
+            Cancelar reserva
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </section>
   )
 }

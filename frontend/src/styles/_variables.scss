@@ -1,0 +1,158 @@
+// =====================================================
+// El Golazo Club - variables de marca y de Bootstrap
+// Se importan ANTES de Bootstrap para sobrescribir sus !default.
+// Identidad definida en el ERS (3.1.1): blanco, cian, verde claro,
+// verde oscuro, Nunito (texto) y Gatorade (títulos).
+// =====================================================
+
+// Marca
+$gl-cyan: #40cdf2; // rgb(64, 205, 242)
+$gl-grass: #4ba51e; // rgb(75, 165, 30)
+$gl-pitch: #2d820f; // rgb(45, 130, 15)
+
+// Neutros derivados de la marca
+$gl-ink: #0c2414; // texto sobre blanco
+$gl-chalk: #f3f8ee; // superficie clara
+$gl-night: #061a1e; // fondo del modo noche
+$gl-tunnel: #0b2a30; // superficie del modo noche
+
+// Espaciado: se agregan 6 y 7 para el ritmo vertical de las secciones
+$spacer: 1rem;
+$spacers: (
+  0: 0,
+  1: $spacer * 0.25,
+  2: $spacer * 0.5,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 3,
+  6: $spacer * 5,
+  7: $spacer * 7.5,
+);
+
+// Opciones de Bootstrap
+$enable-rfs: false;
+$enable-smooth-scroll: false;
+$enable-negative-margins: true;
+
+// Colores del tema
+$primary: $gl-pitch;
+$secondary: #5a6d61;
+$success: $gl-grass;
+$info: $gl-cyan;
+$warning: #f4c20d;
+$danger: #c62828;
+$light: $gl-chalk;
+$dark: $gl-ink;
+
+// Modo claro: "partido de día"
+$body-bg: #ffffff;
+$body-color: $gl-ink;
+$body-emphasis-color: #04120a;
+$body-secondary-color: rgba($gl-ink, 0.72);
+$body-secondary-bg: #e7f1e1;
+$body-tertiary-color: rgba($gl-ink, 0.5);
+$body-tertiary-bg: $gl-chalk;
+$border-color: #d5e3cf;
+$border-color-translucent: rgba($gl-ink, 0.15);
+$link-color: $gl-pitch;
+$link-hover-color: #1f5c0a;
+
+// Modo oscuro: "noche de reflectores"
+$body-bg-dark: $gl-night;
+$body-color-dark: #e6f4ef;
+$body-emphasis-color-dark: #ffffff;
+$body-secondary-color-dark: rgba(#e6f4ef, 0.75);
+$body-secondary-bg-dark: $gl-tunnel;
+$body-tertiary-color-dark: rgba(#e6f4ef, 0.5);
+$body-tertiary-bg-dark: #08222a;
+$border-color-dark: #1f4750;
+$link-color-dark: $gl-cyan;
+$link-hover-color-dark: #8ce3f8;
+
+// Tipografía
+$font-family-sans-serif: 'Nunito Variable', 'Nunito', system-ui, -apple-system,
+  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$font-family-display: 'Gatorade', 'Nunito Variable', system-ui, sans-serif;
+
+$font-size-base: 1.0625rem;
+$line-height-base: 1.65;
+$font-weight-semibold: 700;
+$font-weight-bold: 800;
+
+$headings-font-family: $font-family-display;
+$headings-font-weight: 400;
+$headings-line-height: 1.05;
+$headings-margin-bottom: 1rem;
+
+$h1-font-size: clamp(2.5rem, 5.5vw, 4.25rem);
+$h2-font-size: clamp(2rem, 4.2vw, 3.25rem);
+$h3-font-size: clamp(1.5rem, 2.6vw, 2rem);
+$h4-font-size: 1.5rem;
+$h5-font-size: 1.25rem;
+$h6-font-size: 1rem;
+
+$display-font-family: $font-family-display;
+$display-font-weight: 400;
+$display-line-height: 0.95;
+$display-font-sizes: (
+  1: clamp(3.4rem, 11vw, 9rem),
+  2: clamp(3rem, 8.5vw, 7rem),
+  3: clamp(2.6rem, 6.5vw, 5rem),
+  4: clamp(2.2rem, 5vw, 4rem),
+  5: clamp(2rem, 4vw, 3.2rem),
+  6: clamp(1.8rem, 3vw, 2.4rem),
+);
+
+$lead-font-size: 1.25rem;
+$lead-font-weight: 400;
+
+// Forma
+$border-radius: 0.5rem;
+$border-radius-sm: 0.375rem;
+$border-radius-lg: 0.75rem;
+$border-radius-xl: 1rem;
+$border-radius-xxl: 1.5rem;
+
+// Botones y formularios
+$btn-font-weight: 800;
+$btn-border-width: 2px;
+$btn-border-radius: 0.3rem;
+$btn-border-radius-sm: 0.25rem;
+$btn-border-radius-lg: 0.3rem;
+$btn-padding-y: 0.65rem;
+$btn-padding-x: 1.5rem;
+$btn-padding-y-lg: 0.9rem;
+$btn-padding-x-lg: 2rem;
+$btn-font-size-lg: 1.05rem;
+
+$input-border-width: 2px;
+$input-border-radius: 0.4rem;
+$input-padding-y: 0.7rem;
+$input-padding-x: 1rem;
+$focus-ring-width: 0.25rem;
+$focus-ring-color: rgba($gl-cyan, 0.55);
+$input-btn-focus-color: rgba($gl-cyan, 0.55);
+
+// Movimiento: entradas con ease-out y nada por encima de 300 ms.
+// La misma curva que --ease-out en _base.scss.
+$gl-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+$transition-fade: opacity 0.15s $gl-ease-out;
+$btn-transition:
+  color 0.15s ease-out,
+  background-color 0.15s ease-out,
+  border-color 0.15s ease-out,
+  box-shadow 0.15s ease-out,
+  transform 0.14s $gl-ease-out;
+$modal-fade-transform: scale(0.96);
+$modal-transition: transform 0.2s $gl-ease-out;
+$offcanvas-transition-duration: 0.28s;
+
+// Navegación y otros componentes
+$navbar-padding-y: 0.6rem;
+$nav-link-font-weight: 700;
+$badge-font-weight: 800;
+$badge-border-radius: 0.3rem;
+$card-border-radius: 0.75rem;
+$modal-content-border-radius: 0.75rem;
+$offcanvas-border-width: 0;

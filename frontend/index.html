@@ -1,10 +1,32 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>golazo</title>
+    <link rel="icon" type="image/x-icon" href="/favicon/logoGolazo.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#2d820f" />
+    <meta
+      name="description"
+      content="El Golazo Club: alquiler de canchas sintéticas de fútbol 5 y fútbol 8 en Soacha, Cundinamarca. Luz LED, torneos, ligas y eventos."
+    />
+    <title>El Golazo Club | Canchas sintéticas en Soacha</title>
+    <script>
+      (function () {
+        var tema = 'light'
+        try {
+          var guardado = localStorage.getItem('golazo_theme')
+          if (guardado === 'light' || guardado === 'dark') {
+            tema = guardado
+          } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            tema = 'dark'
+          }
+        } catch (error) {
+          /* sin almacenamiento: se queda en claro */
+        }
+        document.documentElement.setAttribute('data-bs-theme', tema)
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

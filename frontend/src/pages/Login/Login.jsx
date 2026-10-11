@@ -1,13 +1,26 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-
-import { api } from '../../services/api'
-import './Login.css'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  FloatingLabel,
+  Form,
+  Row,
+} from 'react-bootstrap'
 
 import { useAuth } from '../../context/AuthContext'
+import { imagenes } from '../../data/negocio'
+import { api } from '../../services/api'
+import Reveal from '../../components/Reveal/Reveal'
+import logo from '../../assets/logo/logoGolazo.png'
 
 function Login() {
   const navigate = useNavigate()
+  const location = useLocation()
+  // Página desde la que se pidió iniciar sesión (Carrito, Reservas, Perfil...)
+  const destino = location.state?.desde || '/reservas'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -27,9 +40,11 @@ function Login() {
         password,
       })
 
-      login(data.access_token)
+      // Se espera a tener el usuario: si no, la ruta protegida lo ve sin
+      // sesión y lo devuelve a /login.
+      await login(data.access_token)
 
-      navigate('/reservas')
+      navigate(destino, { replace: true })
     } catch (error) {
       setError(error.message)
     } finally {
@@ -38,107 +53,94 @@ function Login() {
   }
 
   return (
-    <section className="auth">
-      <div className="auth__visual">
-        <div className="auth__visual-content">
-          <p>GOLAZO</p>
+    <Row className="g-0 min-vh-page">
+      <Col
+        lg={6}
+        className="auth-visual d-none d-lg-flex align-items-end p-5"
+        data-bs-theme="dark"
+      >
+        <img className="auth-visual__bg" src={imagenes.partidoNoche} alt="" />
 
-          <h1>
-            VIVE
-            <br />
-            EL PARTIDO.
-          </h1>
+        <div>
+          <img src={logo} alt="El Golazo Club" height="110" className="mb-4" />
 
-          <span>
-            Reserva, compra y disfruta todo lo que Golazo tiene
-            para ti.
-          </span>
+          <h1 className="display-4 text-uppercase">Vive el partido</h1>
+
+          <p className="lead mb-0 col-xl-9">
+            Reserva tu cancha y disfruta todo lo que El Golazo tiene para ti.
+          </p>
         </div>
-      </div>
+      </Col>
 
-      <div className="auth__form-container">
-        <div className="auth__form">
-
-          <div className="auth__header">
-            <p>BIENVENIDO DE NUEVO</p>
-
-            <h2>Iniciar sesión</h2>
-
-            <span>
-              Ingresa a tu cuenta para continuar.
-            </span>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-
-            <div className="auth__field">
-              <label htmlFor="email">
-                Correo electrónico
-              </label>
-
-              <input
-                id="email"
-                type="email"
-                placeholder="tu@email.com"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-              />
-            </div>
-
-            <div className="auth__field">
-              <label htmlFor="password">
-                Contraseña
-              </label>
-
-              <input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-              />
-            </div>
-
-            <div className="auth__options">
-              <label>
-                <input type="checkbox" />
-                <span>Recordarme</span>
-              </label>
-
-              <button type="button">
-                ¿Olvidaste tu contraseña?
-              </button>
-            </div>
-
-            {error && (
-              <p className="auth__error">
-                {error}
+      <Col
+        lg={6}
+        className="d-flex align-items-center justify-content-center bg-body-tertiary p-4 py-6"
+      >
+        <Reveal className="w-100" style={{ maxWidth: '28rem' }}>
+          <Card className="border-0 shadow">
+            <Card.Body className="p-4 p-md-5">
+              <h2 className="fs-1 mb-1">Iniciar sesión</h2>
+              <p className="text-body-secondary mb-4">
+                Ingresa a tu cuenta para continuar.
               </p>
-            )}
 
-            <button
-              className="auth__submit"
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-            </button>
+              <Form onSubmit={handleSubmit}>
+                <FloatingLabel controlId="email" label="Correo electrónico" className="mb-3">
+                  <Form.Control
+                    type="email"
+                    placeholder="tu@email.com"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    required
+                  />
+                </FloatingLabel>
 
-          </form>
+                <FloatingLabel controlId="password" label="Contraseña" className="mb-3">
+                  <Form.Control
+                    type="password"
+                    placeholder="Contraseña"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    required
+                  />
+                </FloatingLabel>
 
-          <div className="auth__footer">
-            <span>¿Todavía no tienes una cuenta?</span>
+                <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+                  <Form.Check type="checkbox" id="recordarme" label="Recordarme" />
 
-            <Link to="/registro">
-              Crear cuenta
-            </Link>
-          </div>
+                  <Button type="button" variant="link" className="p-0">
+                    ¿Olvidaste tu contraseña?
+                  </Button>
+                </div>
 
-        </div>
-      </div>
-    </section>
+                {error && (
+                  <Alert variant="danger" className="py-2">
+                    {error}
+                  </Alert>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  className="w-100"
+                  disabled={loading}
+                >
+                  {loading ? 'Iniciando sesión…' : 'Iniciar sesión'}
+                </Button>
+              </Form>
+
+              <p className="text-center text-body-secondary mt-4 mb-0">
+                ¿Todavía no tienes una cuenta?{' '}
+                <Link to="/registro" state={location.state} className="fw-bold">
+                  Crear cuenta
+                </Link>
+              </p>
+            </Card.Body>
+          </Card>
+        </Reveal>
+      </Col>
+    </Row>
   )
 }
 

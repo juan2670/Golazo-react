@@ -1,0 +1,141 @@
+@font-face {
+  font-family: 'Gatorade';
+  src: url('../assets/fonts/Gatorade/gatorade-black.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --gl-cyan: #{$gl-cyan};
+  --gl-grass: #{$gl-grass};
+  --gl-pitch: #{$gl-pitch};
+  --gl-ink: #{$gl-ink};
+  --gl-night: #{$gl-night};
+  --nav-h: 4.9rem;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  @include media-breakpoint-up(md) {
+    --nav-h: 5.4rem;
+  }
+
+  @include media-breakpoint-up(xl) {
+    --nav-h: 6.4rem;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  // Sin destello gris al tocar y sin esperar el doble toque en celulares
+  -webkit-tap-highlight-color: transparent;
+}
+
+a,
+button,
+.btn,
+.nav-link,
+summary,
+[role='button'] {
+  touch-action: manipulation;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+h1,
+h2,
+h3,
+.display-1,
+.display-2,
+.display-3,
+.display-4 {
+  text-wrap: balance;
+  letter-spacing: 0.005em;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: $gl-cyan;
+  color: $gl-ink;
+}
+
+.main-offset {
+  padding-top: var(--nav-h);
+}
+
+.min-vh-page {
+  min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100dvh - var(--nav-h));
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 3000;
+}
+
+.font-display {
+  font-family: $font-family-display;
+  font-weight: 400;
+}
+
+// Evita que SplitText recorte las colas de g, y, p dentro de la máscara
+.split-line-mask {
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+// Mapa de Google en modo noche
+[data-bs-theme='dark'] .map-frame iframe {
+  filter: invert(0.92) hue-rotate(180deg) contrast(0.9) saturate(0.8);
+}
+
+// Transición circular del cambio de tema (View Transitions API)
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+// Bootstrap deja el margen negativo de .row (g-5 = 1.5rem) más grande que el
+// relleno del contenedor en celular (0.75rem) y la página se desborda de lado.
+@include media-breakpoint-down(md) {
+  .row.g-5,
+  .row.gx-5 {
+    --bs-gutter-x: 1.5rem;
+  }
+}
+
+// Pantallas grandes: el contenido crece un poco en vez de quedar angosto
+@media (min-width: 1600px) {
+  .container {
+    max-width: 1440px;
+  }
+}

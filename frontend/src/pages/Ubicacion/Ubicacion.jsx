@@ -1,68 +1,114 @@
 import { Link } from 'react-router-dom'
-import './Ubicacion.css'
+import { Button, Col, Container, Row } from 'react-bootstrap'
+import {
+  ClockFill,
+  EnvelopeFill,
+  GeoAltFill,
+  TelephoneFill,
+} from 'react-bootstrap-icons'
+
+import Magnetic from '../../components/Magnetic/Magnetic'
+import PageHero from '../../components/PageHero/PageHero'
+import Reveal from '../../components/Reveal/Reveal'
+import { imagenes, negocio } from '../../data/negocio'
+
+function Dato({ icono: Icono, titulo, children }) {
+  return (
+    <div className="d-flex gap-3 py-4 border-bottom">
+      <Icono className="text-success flex-shrink-0 mt-1" size={22} />
+
+      <div>
+        <h2 className="h5 mb-1">{titulo}</h2>
+        {children}
+      </div>
+    </div>
+  )
+}
 
 function Ubicacion() {
   return (
-    <section className="ubicacion">
-      <div className="ubicacion__header">
-        <p>ENCUÉNTRANOS</p>
+    <>
+      <PageHero
+        titulo="Ven a jugar"
+        descripcion="Estamos en Soacha, Cundinamarca, con parqueadero y zona social para ti y tu equipo."
+        imagen={imagenes.canchaF5}
+      />
 
-        <h1>
-          VEN A
-          <br />
-          JUGAR.
-        </h1>
+      <section className="py-7">
+        <Container>
+          <Row className="g-5">
+            <Col lg={7}>
+              <Reveal>
+                <div className="map-frame ratio ratio-4x3 chamfer">
+                  <iframe
+                    title="Mapa de El Golazo Club en Soacha"
+                    src={negocio.mapaEmbed}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    allowFullScreen
+                  />
+                </div>
+              </Reveal>
+            </Col>
 
-        <span>
-          Estamos ubicados en Bogotá para que puedas llegar,
-          reservar y empezar tu partido.
-        </span>
-      </div>
+            <Col lg={5}>
+              <Reveal delay={0.1}>
+                <Dato icono={GeoAltFill} titulo="Dirección">
+                  <p className="mb-3">{negocio.direccion}</p>
 
-      <div className="ubicacion__layout">
-        <div className="ubicacion__map">
-          <div className="ubicacion__map-overlay">
-            <span>GOLAZO</span>
-          </div>
-        </div>
+                  <Button
+                    href={negocio.mapaHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="primary"
+                    size="sm"
+                  >
+                    Abrir en Google Maps
+                  </Button>
+                </Dato>
 
-        <div className="ubicacion__info">
-          <div>
-            <p>UBICACIÓN</p>
+                <Dato icono={ClockFill} titulo="Horario de atención">
+                  <p className="mb-0">{negocio.horario.dias}</p>
+                  <p className="font-display fs-3 text-success mb-0">
+                    {negocio.horario.horas}
+                  </p>
+                </Dato>
 
-            <h2>Bogotá, Colombia</h2>
+                <Dato icono={TelephoneFill} titulo="Teléfono">
+                  <a href={negocio.telefonoHref}>{negocio.telefono}</a>
+                </Dato>
 
-            <span>
-              Dirección próximamente disponible.
-            </span>
-          </div>
+                <Dato icono={EnvelopeFill} titulo="Correo">
+                  <a href={`mailto:${negocio.email}`} className="text-break">
+                    {negocio.email}
+                  </a>
+                </Dato>
 
-          <div>
-            <p>HORARIOS</p>
+                <div className="d-flex flex-wrap gap-3 pt-4">
+                  <Magnetic>
+                    <Button
+                      href={negocio.whatsapp}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      variant="outline-primary"
+                      className="btn-sport"
+                    >
+                      <span>WhatsApp</span>
+                    </Button>
+                  </Magnetic>
 
-            <h2>Todos los días</h2>
-
-            <span>
-              8:00 AM — 12:00 AM
-            </span>
-          </div>
-
-          <div>
-            <p>CONTACTO</p>
-
-            <h2>+57 300 000 0000</h2>
-
-            <span>
-              contacto@golazo.com
-            </span>
-          </div>
-
-          <Link to="/reservas">
-            Reservar una cancha →
-          </Link>
-        </div>
-      </div>
-    </section>
+                  <Magnetic>
+                    <Button as={Link} to="/reservas" variant="primary" className="btn-sport">
+                      <span>Reservar cancha</span>
+                    </Button>
+                  </Magnetic>
+                </div>
+              </Reveal>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+    </>
   )
 }
 

@@ -1,0 +1,116 @@
+// Elementos firma del estilo deportivo: esquinas biseladas, botón
+// paralelogramo, texto de marcador LED y franjas de césped cortado.
+
+.chamfer {
+  --cut: 1.75rem;
+
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--cut)) 0,
+    100% var(--cut),
+    100% 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut))
+  );
+}
+
+.btn-sport {
+  transform: skewX(-10deg);
+  border-radius: 0.2rem;
+
+  > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    transform: skewX(10deg);
+  }
+}
+
+// En modo noche los botones de marca cambian de verde oscuro a verde pasto
+// y cian, que se leen mejor sobre el fondo oscuro.
+[data-bs-theme='dark'] {
+  .btn-primary {
+    --bs-btn-color: #{$gl-ink};
+    --bs-btn-bg: #{$gl-grass};
+    --bs-btn-border-color: #{$gl-grass};
+    --bs-btn-hover-color: #{$gl-ink};
+    --bs-btn-hover-bg: #62bf30;
+    --bs-btn-hover-border-color: #62bf30;
+    --bs-btn-active-color: #{$gl-ink};
+    --bs-btn-active-bg: #74cf42;
+    --bs-btn-active-border-color: #74cf42;
+    --bs-btn-disabled-color: #{$gl-ink};
+    --bs-btn-disabled-bg: #{$gl-grass};
+    --bs-btn-disabled-border-color: #{$gl-grass};
+  }
+
+  .btn-outline-primary {
+    --bs-btn-color: #{$gl-cyan};
+    --bs-btn-border-color: #{$gl-cyan};
+    --bs-btn-hover-color: #{$gl-ink};
+    --bs-btn-hover-bg: #{$gl-cyan};
+    --bs-btn-hover-border-color: #{$gl-cyan};
+    --bs-btn-active-color: #{$gl-ink};
+    --bs-btn-active-bg: #{$gl-cyan};
+    --bs-btn-active-border-color: #{$gl-cyan};
+    --bs-btn-disabled-color: #{$gl-cyan};
+    --bs-btn-disabled-border-color: #{$gl-cyan};
+  }
+
+  .nav-pills {
+    --bs-nav-pills-link-active-color: #{$gl-ink};
+    --bs-nav-pills-link-active-bg: #{$gl-grass};
+  }
+}
+
+.led-text {
+  font-family: $font-family-display;
+  font-weight: 400;
+
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+
+  background-image: radial-gradient(
+    circle at 50% 50%,
+    var(--led-color, #{$gl-cyan}) 0 34%,
+    transparent 40%
+  );
+  background-size: 0.085em 0.085em;
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  filter: drop-shadow(0 0 0.18em rgba($gl-cyan, 0.5));
+}
+
+.pitch-stripes {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba($gl-grass, 0.1) 0 3.5rem,
+    transparent 3.5rem 7rem
+  );
+}
+
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--bs-body-color);
+}
+
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 1100;
+
+  height: 4px;
+
+  pointer-events: none;
+
+  &__bar {
+    height: 100%;
+
+    background: linear-gradient(90deg, $gl-grass, $gl-cyan);
+
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+}

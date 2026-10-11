@@ -1,0 +1,15 @@
+// El Golazo Club - Bootstrap 5.3 personalizado.
+// El orden importa: variables -> Bootstrap -> capa propia.
+
+@import 'variables';
+@import 'bootstrap/scss/bootstrap';
+
+@import 'base';
+@import 'sport';
+
+@import 'components/navbar';
+@import 'components/hero';
+@import 'components/sections';
+@import 'components/videos';
+@import 'motion';
+@import 'components/layout';

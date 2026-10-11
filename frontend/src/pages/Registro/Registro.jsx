@@ -1,11 +1,24 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Container,
+  FloatingLabel,
+  Form,
+  Row,
+} from 'react-bootstrap'
 
 import { api } from '../../services/api'
-import './Registro.css'
+import Reveal from '../../components/Reveal/Reveal'
+import logo from '../../assets/logo/logoGolazo.png'
 
 function Registro() {
   const navigate = useNavigate()
+  // Se conserva a dónde volver después de iniciar sesión (p. ej. el carrito)
+  const location = useLocation()
 
   const [nombre, setNombre] = useState('')
   const [apellido, setApellido] = useState('')
@@ -43,7 +56,7 @@ function Registro() {
         telefono: telefono || null,
       })
 
-      navigate('/login')
+      navigate('/login', { state: location.state })
     } catch (error) {
       setError(error.message)
     } finally {
@@ -52,161 +65,132 @@ function Registro() {
   }
 
   return (
-    <section className="registro">
-      <div className="registro__container">
+    <section className="bg-body-tertiary min-vh-page py-6">
+      <Container style={{ maxWidth: '42rem' }}>
+        <Reveal>
+          <header className="text-center mb-4">
+            <img src={logo} alt="El Golazo Club" height="90" className="mb-3" />
 
-        <div className="registro__header">
-          <p>GOLAZO</p>
+            <h1 className="display-5">Crear cuenta</h1>
 
-          <h1>Crear cuenta.</h1>
-
-          <span>
-            Regístrate para reservar canchas y realizar tus
-            compras.
-          </span>
-        </div>
-
-        <form
-          className="registro__form"
-          onSubmit={handleSubmit}
-        >
-
-          <div className="registro__row">
-
-            <div className="registro__field">
-              <label htmlFor="nombre">
-                Nombre
-              </label>
-
-              <input
-                id="nombre"
-                type="text"
-                placeholder="Sebastián"
-                value={nombre}
-                onChange={(event) => setNombre(event.target.value)}
-                required
-              />
-            </div>
-
-            <div className="registro__field">
-              <label htmlFor="apellido">
-                Apellido
-              </label>
-
-              <input
-                id="apellido"
-                type="text"
-                placeholder="Pérez"
-                value={apellido}
-                onChange={(event) => setApellido(event.target.value)}
-                required
-              />
-            </div>
-
-          </div>
-
-          <div className="registro__field">
-            <label htmlFor="registro-email">
-              Correo electrónico
-            </label>
-
-            <input
-              id="registro-email"
-              type="email"
-              placeholder="tu@email.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-          </div>
-
-          <div className="registro__field">
-            <label htmlFor="telefono">
-              Teléfono
-            </label>
-
-            <input
-              id="telefono"
-              type="tel"
-              placeholder="+57 300 000 0000"
-              value={telefono}
-              onChange={(event) => setTelefono(event.target.value)}
-            />
-          </div>
-
-          <div className="registro__row">
-
-            <div className="registro__field">
-              <label htmlFor="registro-password">
-                Contraseña
-              </label>
-
-              <input
-                id="registro-password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                minLength={8}
-                required
-              />
-            </div>
-
-            <div className="registro__field">
-              <label htmlFor="confirmar-password">
-                Confirmar contraseña
-              </label>
-
-              <input
-                id="confirmar-password"
-                type="password"
-                placeholder="••••••••"
-                value={confirmarPassword}
-                onChange={(event) =>
-                  setConfirmarPassword(event.target.value)
-                }
-                minLength={8}
-                required
-              />
-            </div>
-
-          </div>
-
-          <label className="registro__terms">
-            <input
-              type="checkbox"
-              required
-            />
-
-            <span>
-              Acepto los términos y condiciones de Golazo.
-            </span>
-          </label>
-
-          {error && (
-            <p className="registro__error">
-              {error}
+            <p className="text-body-secondary mb-0">
+              Regístrate para reservar canchas y realizar tus compras.
             </p>
-          )}
+          </header>
 
-          <button
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? 'Creando cuenta...' : 'Crear cuenta'}
-          </button>
+          <Card className="border-0 shadow">
+            <Card.Body className="p-4 p-md-5">
+              <Form onSubmit={handleSubmit}>
+                <Row className="g-3">
+                  <Col md={6}>
+                    <FloatingLabel controlId="nombre" label="Nombre">
+                      <Form.Control
+                        type="text"
+                        placeholder="Tu nombre"
+                        value={nombre}
+                        onChange={(event) => setNombre(event.target.value)}
+                        required
+                      />
+                    </FloatingLabel>
+                  </Col>
 
-        </form>
+                  <Col md={6}>
+                    <FloatingLabel controlId="apellido" label="Apellido">
+                      <Form.Control
+                        type="text"
+                        placeholder="Tu apellido"
+                        value={apellido}
+                        onChange={(event) => setApellido(event.target.value)}
+                        required
+                      />
+                    </FloatingLabel>
+                  </Col>
 
-        <div className="registro__footer">
-          <span>¿Ya tienes una cuenta?</span>
+                  <Col xs={12}>
+                    <FloatingLabel controlId="registro-email" label="Correo electrónico">
+                      <Form.Control
+                        type="email"
+                        placeholder="tu@email.com"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        required
+                      />
+                    </FloatingLabel>
+                  </Col>
 
-          <Link to="/login">
-            Iniciar sesión
-          </Link>
-        </div>
+                  <Col xs={12}>
+                    <FloatingLabel controlId="telefono" label="Teléfono (opcional)">
+                      <Form.Control
+                        type="tel"
+                        placeholder="+57 300 000 0000"
+                        value={telefono}
+                        onChange={(event) => setTelefono(event.target.value)}
+                      />
+                    </FloatingLabel>
+                  </Col>
 
-      </div>
+                  <Col md={6}>
+                    <FloatingLabel controlId="registro-password" label="Contraseña">
+                      <Form.Control
+                        type="password"
+                        placeholder="Contraseña"
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        minLength={8}
+                        required
+                      />
+                    </FloatingLabel>
+                  </Col>
+
+                  <Col md={6}>
+                    <FloatingLabel controlId="confirmar-password" label="Confirmar contraseña">
+                      <Form.Control
+                        type="password"
+                        placeholder="Confirmar contraseña"
+                        value={confirmarPassword}
+                        onChange={(event) => setConfirmarPassword(event.target.value)}
+                        minLength={8}
+                        required
+                      />
+                    </FloatingLabel>
+                  </Col>
+                </Row>
+
+                <Form.Check
+                  type="checkbox"
+                  id="terminos"
+                  label="Acepto los términos y condiciones de El Golazo."
+                  className="my-4"
+                  required
+                />
+
+                {error && (
+                  <Alert variant="danger" className="py-2">
+                    {error}
+                  </Alert>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  className="w-100"
+                  disabled={loading}
+                >
+                  {loading ? 'Creando cuenta…' : 'Crear cuenta'}
+                </Button>
+              </Form>
+            </Card.Body>
+          </Card>
+
+          <p className="text-center text-body-secondary mt-4 mb-0">
+            ¿Ya tienes una cuenta?{' '}
+            <Link to="/login" state={location.state} className="fw-bold">
+              Iniciar sesión
+            </Link>
+          </p>
+        </Reveal>
+      </Container>
     </section>
   )
 }
