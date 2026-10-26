@@ -1,0 +1,649 @@
+// =====================================================
+// Reserva con vista aérea 3D
+// Móvil primero: alturas con svh/dvh, controles táctiles de 44 px o más,
+// hover solo con mouse y contraste AA en modo claro y oscuro.
+// =====================================================
+
+.aerea {
+  // Acento y verde de texto con contraste suficiente sobre cada fondo
+  --aerea-acento: #0b6e8a;
+  --aerea-acento-texto: #fff;
+  --aerea-total: #2d6a12;
+  // Borde de controles: 3:1 contra el fondo (WCAG 1.4.11)
+  --aerea-borde: #76867b;
+}
+
+[data-bs-theme='dark'] .aerea {
+  --aerea-acento: #{$gl-cyan};
+  --aerea-acento-texto: #{$gl-ink};
+  --aerea-total: #9cf08a;
+  --aerea-borde: #6f939c;
+}
+
+// ---------- Estado de cada cancha: icono + palabra + color ----------
+
+.estado-cancha {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+
+  &--libre {
+    color: #2d6a12;
+  }
+
+  &--ocupada {
+    color: #b3261e;
+  }
+
+  &--seleccionada {
+    color: #0b6e8a;
+  }
+
+  &--cargando {
+    color: #4a5a60;
+  }
+}
+
+[data-bs-theme='dark'] .estado-cancha {
+  &--libre {
+    color: #9cf08a;
+  }
+
+  &--ocupada {
+    color: #ffa79d;
+  }
+
+  &--seleccionada {
+    color: #8be3f8;
+  }
+
+  &--cargando {
+    color: #dbe6e9;
+  }
+}
+
+// ---------- Visor 3D ----------
+
+.aerea__visor {
+  position: relative;
+  overflow: hidden;
+
+  // Un visor amplio para reconocer y elegir las canchas desde el modelo.
+  height: clamp(23rem, 62svh, 38rem);
+
+  border-radius: 0.75rem;
+  background: $gl-night;
+  color: #fff;
+
+  user-select: none;
+  -webkit-user-select: none;
+  overscroll-behavior: contain;
+
+  @include media-breakpoint-up(lg) {
+    height: min(82dvh, 54rem);
+  }
+
+  &:focus-visible {
+    outline: 3px solid $gl-cyan;
+    outline-offset: 3px;
+  }
+
+  canvas {
+    display: block;
+
+    // El visor atrapa los gestos: un dedo gira, dos dedos acercan
+    touch-action: none;
+  }
+}
+
+.aerea__cargando {
+  position: absolute;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+
+  font-weight: 700;
+}
+
+.aerea__leyenda,
+.aerea__noche {
+  position: absolute;
+  top: 0.75rem;
+
+  margin: 0;
+  padding: 0.4rem 0.7rem;
+
+  border-radius: 0.6rem;
+  background: rgba($gl-night, 0.88);
+
+  font-size: 0.8rem;
+
+  pointer-events: none;
+}
+
+.aerea__leyenda {
+  left: 0.75rem;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.85rem;
+
+  list-style: none;
+}
+
+.aerea__noche {
+  right: 0.75rem;
+
+  color: #ffe9a8;
+  font-weight: 800;
+}
+
+.aerea__vistas {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.25rem;
+  width: min(26rem, calc(100% - 1.5rem));
+  padding: 0.25rem;
+
+  border-radius: 0.7rem;
+  background: rgba($gl-night, 0.9);
+
+  transform: translateX(-50%);
+}
+
+.aerea__vista {
+  min-height: 2.75rem;
+  padding: 0 0.4rem;
+
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #fff;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  transition:
+    transform 0.14s var(--ease-out),
+    background-color 0.15s ease-out;
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &[aria-pressed='true'] {
+    background: $gl-cyan;
+    color: $gl-ink;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+  }
+
+  &:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 1px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(:disabled):not([aria-pressed='true']) {
+      background: rgba(255, 255, 255, 0.16);
+    }
+  }
+}
+
+.aerea__ayuda {
+  margin: 0.6rem 0 0;
+
+  color: var(--bs-secondary-color);
+  font-size: 0.85rem;
+}
+
+// ---------- Selector de canchas (teclado, lector de pantalla, sin 3D) ----------
+
+.aerea__selector {
+  min-width: 0;
+  margin: 1.25rem 0 0;
+  padding: 0;
+
+  border: 0;
+}
+
+.aerea__opciones {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
+}
+
+.cancha-opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.5rem;
+  padding: 0.7rem 0.9rem;
+
+  border: 2px solid var(--aerea-borde);
+  border-radius: 0.65rem;
+  background: var(--bs-body-bg);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.14s var(--ease-out),
+    border-color 0.15s ease-out,
+    background-color 0.15s ease-out;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &--elegida {
+    border-color: var(--aerea-acento);
+    background: var(--bs-tertiary-bg);
+  }
+
+  &:has(input:focus-visible) {
+    outline: 3px solid var(--aerea-acento);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      border-color: var(--aerea-acento);
+    }
+  }
+
+  &__tipo {
+    flex: 0 0 auto;
+
+    width: 2.6rem;
+    height: 2.6rem;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 0.45rem;
+    background: var(--bs-secondary-bg);
+    color: var(--bs-emphasis-color);
+
+    font-family: $font-family-display;
+    font-size: 1rem;
+  }
+
+  &__datos {
+    flex: 1 1 auto;
+
+    display: grid;
+    min-width: 0;
+
+    line-height: 1.25;
+
+    small {
+      color: var(--bs-secondary-color);
+    }
+  }
+}
+
+// ---------- Panel de reserva ----------
+
+.aerea__panel {
+  padding: 1.25rem;
+
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.75rem;
+  background: var(--bs-body-bg);
+
+  @include media-breakpoint-up(lg) {
+    position: sticky;
+    top: calc(var(--nav-h) + 1rem);
+  }
+}
+
+.aerea__segmento {
+  display: inline-flex;
+  overflow: hidden;
+
+  border: 2px solid var(--aerea-borde);
+  border-radius: 0.6rem;
+}
+
+.aerea__segmento-opcion {
+  cursor: pointer;
+
+  span {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 1.1rem;
+
+    font-weight: 700;
+
+    transition: background-color 0.15s ease-out;
+  }
+
+  input:checked + span {
+    background: var(--aerea-acento);
+    color: var(--aerea-acento-texto);
+  }
+
+  &:has(input:focus-visible) {
+    outline: 3px solid var(--aerea-acento);
+    outline-offset: -3px;
+  }
+}
+
+// Formato del bloque grande (Fútbol 5 / Fútbol 8): dos opciones a todo el ancho
+.aerea__segmento--ancho {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+
+  .aerea__segmento-opcion span {
+    justify-content: center;
+  }
+}
+
+// ---------- Día y noche: sol claro y luna oscura, para leerlas de un vistazo ----------
+
+.aerea__franjas-dia {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tarifas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+}
+
+.tarifa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+
+  border-radius: 999px;
+
+  font-size: 0.8rem;
+  line-height: 1.3;
+  white-space: nowrap;
+
+  &--dia {
+    background: #fff1c2;
+    color: #5c4300;
+
+    svg {
+      color: #b37a00;
+    }
+  }
+
+  &--noche {
+    background: #0f2a33;
+    color: #d5ecf4;
+
+    svg {
+      color: #ffe9a8;
+    }
+  }
+}
+
+[data-bs-theme='dark'] .tarifa--dia {
+  background: rgba(244, 194, 13, 0.16);
+  color: #ffe08a;
+
+  svg {
+    color: #ffd23f;
+  }
+}
+
+[data-bs-theme='dark'] .tarifa--noche {
+  background: #04141a;
+  box-shadow: inset 0 0 0 1px #2c4a54;
+}
+
+.aerea__tarifas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 0.35rem;
+}
+
+.aerea__horas {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.franja {
+  min-height: 2.75rem;
+
+  display: grid;
+  place-items: center;
+
+  border: 2px solid var(--aerea-borde);
+  border-radius: 0.55rem;
+
+  font-size: 0.92rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.14s var(--ease-out),
+    background-color 0.15s ease-out,
+    border-color 0.15s ease-out;
+
+  &:active:not(&--ocupada) {
+    transform: scale(0.97);
+  }
+
+  &--activa {
+    border-color: var(--aerea-acento);
+    background: var(--aerea-acento);
+    color: var(--aerea-acento-texto);
+  }
+
+  // Ocupada: gris, tachada y con borde punteado (no solo color)
+  &--ocupada {
+    border-style: dashed;
+    background: var(--bs-secondary-bg);
+    color: var(--bs-secondary-color);
+
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+
+  &:has(input:focus-visible) {
+    outline: 3px solid var(--aerea-acento);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(&--ocupada):not(&--activa) {
+      border-color: var(--aerea-acento);
+    }
+  }
+
+  // Luna pequeña en las horas con tarifa de noche
+  &__noche {
+    margin-left: 0.25rem;
+    vertical-align: 0.05em;
+    opacity: 0.75;
+  }
+}
+
+// ---------- Calendario de mes completo ----------
+
+.calendario {
+  padding: 0.6rem;
+
+  border: 2px solid var(--aerea-borde);
+  border-radius: 0.65rem;
+
+  &__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+  }
+
+  &__titulo {
+    margin: 0;
+
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  &__nav {
+    width: 2.75rem;
+    height: 2.75rem;
+
+    display: grid;
+    place-items: center;
+
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--bs-body-color);
+
+    transition:
+      transform 0.14s var(--ease-out),
+      background-color 0.15s ease-out;
+
+    &:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--aerea-acento);
+      outline-offset: 1px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:disabled) {
+        background: var(--bs-secondary-bg);
+      }
+    }
+  }
+
+  &__grilla {
+    width: 100%;
+
+    border-collapse: separate;
+    border-spacing: 0.15rem;
+    table-layout: fixed;
+
+    th {
+      padding-bottom: 0.2rem;
+
+      color: var(--bs-secondary-color);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    td {
+      padding: 0;
+    }
+  }
+
+  &__dia {
+    width: 100%;
+    min-height: 2.75rem;
+
+    display: grid;
+    place-items: center;
+
+    border: 2px solid transparent;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--bs-body-color);
+
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+
+    transition:
+      transform 0.14s var(--ease-out),
+      background-color 0.15s ease-out,
+      border-color 0.15s ease-out;
+
+    &:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
+    // Hoy: anillo, sin llenar
+    &--hoy {
+      border-color: var(--aerea-borde);
+    }
+
+    &--elegido {
+      border-color: var(--aerea-acento);
+      background: var(--aerea-acento);
+      color: var(--aerea-acento-texto);
+    }
+
+    // Días pasados: no se pueden elegir
+    &:disabled {
+      color: var(--bs-secondary-color);
+      opacity: 0.5;
+      text-decoration: line-through;
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--aerea-acento);
+      outline-offset: 1px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(:disabled):not(.calendario__dia--elegido) {
+        border-color: var(--aerea-acento);
+      }
+    }
+  }
+}
+
+.aerea__resumen {
+  padding: 1rem;
+
+  border-radius: 0.65rem;
+  background: var(--bs-tertiary-bg);
+}
+
+.aerea__total {
+  color: var(--aerea-total);
+}
+
+// ---------- Movimiento reducido: sin escalas, la respuesta sigue por opacidad ----------
+
+@media (prefers-reduced-motion: reduce) {
+  .aerea__vista,
+  .cancha-opcion,
+  .franja,
+  .calendario__nav,
+  .calendario__dia {
+    transition: none;
+
+    &:active:not(:disabled) {
+      transform: none;
+      opacity: 0.85;
+    }
+  }
+}

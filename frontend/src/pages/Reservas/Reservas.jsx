@@ -1,20 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Alert,
   Badge,
   Button,
   Card,
-  Col,
   Collapse,
   Container,
-  FloatingLabel,
-  Form,
   Modal,
-  Row,
   Spinner,
 } from 'react-bootstrap'
 
 import Reveal from '../../components/Reveal/Reveal'
+import ReservaAerea from '../../components/ReservaAerea/ReservaAerea'
 import SplitHeading from '../../components/SplitHeading/SplitHeading'
 import { api } from '../../services/api'
 
@@ -67,19 +64,8 @@ function TarjetaReserva({ reserva, cancelada = false, cancelando, alCancelar }) 
 }
 
 function Reservas() {
-  const [canchas, setCanchas] = useState([])
-  const [canchaId, setCanchaId] = useState('')
-  const [fecha, setFecha] = useState('')
-  const [hora, setHora] = useState('')
-  const [duracion, setDuracion] = useState('1')
-  const [horarios, setHorarios] = useState([])
-
   const [mensaje, setMensaje] = useState('')
   const [error, setError] = useState('')
-
-  const [cargandoCanchas, setCargandoCanchas] = useState(true)
-  const [cargandoHorarios, setCargandoHorarios] = useState(false)
-  const [reservando, setReservando] = useState(false)
 
   const [misReservas, setMisReservas] = useState([])
   const [cargandoReservas, setCargandoReservas] = useState(true)
@@ -87,172 +73,35 @@ function Reservas() {
   const [reservaPorCancelar, setReservaPorCancelar] = useState(null)
   const [mostrarHistorial, setMostrarHistorial] = useState(false)
 
-  const canchaSeleccionada = canchas.find(
-    (cancha) => cancha.id === Number(canchaId),
-  )
-
-  const precioBase = canchaSeleccionada
-    ? Number(canchaSeleccionada.precio_hora)
-    : 0
-
-  const totalEstimado = precioBase * Number(duracion)
-
-  // =====================================================
-  // CARGAR CANCHAS
-  // =====================================================
-
-  useEffect(() => {
-    const cargarCanchas = async () => {
-      try {
-        setCargandoCanchas(true)
-        setError('')
-
-        const data = await api.get('/canchas/')
-
-        setCanchas(data)
-      } catch (error) {
-        setError(error.message)
-      } finally {
-        setCargandoCanchas(false)
-      }
-    }
-
-    cargarCanchas()
-  }, [])
+  // Al cancelar una reserva sube este contador y la vista aérea vuelve a
+  // pedir la disponibilidad al servidor
+  const [versionDisponibilidad, setVersionDisponibilidad] = useState(0)
 
   // =====================================================
   // CARGAR MIS RESERVAS
   // =====================================================
 
-  useEffect(() => {
-    const cargarMisReservas = async () => {
-      try {
-        setCargandoReservas(true)
-
-        const data = await api.get('/reservas/')
-
-        setMisReservas(data)
-      } catch (error) {
-        setError(error.message)
-      } finally {
-        setCargandoReservas(false)
-      }
+  const cargarMisReservas = useCallback(async () => {
+    try {
+      setMisReservas(await api.get('/reservas/'))
+    } catch (falla) {
+      setError(falla.message)
     }
-
-    cargarMisReservas()
   }, [])
 
-  // =====================================================
-  // CARGAR DISPONIBILIDAD
-  // =====================================================
-
   useEffect(() => {
-    if (!canchaId || !fecha) {
-      setHorarios([])
-      setHora('')
-      return
+    let vigente = true
+
+    api
+      .get('/reservas/')
+      .then((datos) => vigente && setMisReservas(datos))
+      .catch((falla) => vigente && setError(falla.message))
+      .finally(() => vigente && setCargandoReservas(false))
+
+    return () => {
+      vigente = false
     }
-
-    const cargarDisponibilidad = async () => {
-      try {
-        setCargandoHorarios(true)
-        setError('')
-        setHora('')
-
-        const data = await api.get(
-          `/reservas/disponibilidad?cancha_id=${canchaId}&fecha=${fecha}`,
-        )
-
-        setHorarios(data.horarios)
-      } catch (error) {
-        setHorarios([])
-        setError(error.message)
-      } finally {
-        setCargandoHorarios(false)
-      }
-    }
-
-    cargarDisponibilidad()
-  }, [canchaId, fecha])
-
-  // =====================================================
-  // HORARIOS DISPONIBLES
-  // =====================================================
-
-  const horariosDisponibles = horarios.filter((horario, index) => {
-    if (!horario.disponible) {
-      return false
-    }
-
-    const horas = Number(duracion)
-
-    for (let i = 0; i < horas; i++) {
-      const siguienteHorario = horarios[index + i]
-
-      if (!siguienteHorario || !siguienteHorario.disponible) {
-        return false
-      }
-    }
-
-    return true
-  })
-
-  // =====================================================
-  // CREAR RESERVA
-  // =====================================================
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-
-    setMensaje('')
-    setError('')
-
-    if (!canchaId || !fecha || !hora) {
-      setError('Completa todos los campos para continuar.')
-      return
-    }
-
-    const horaInicio = Number(hora.split(':')[0])
-    const horaFin = horaInicio + Number(duracion)
-
-    const horaFinFormateada =
-      horaFin === 24
-        ? '00:00'
-        : `${String(horaFin).padStart(2, '0')}:00`
-
-    try {
-      setReservando(true)
-
-      const reserva = await api.post('/reservas/', {
-        cancha_id: Number(canchaId),
-        fecha,
-        hora_inicio: hora,
-        hora_fin: horaFinFormateada,
-      })
-
-      setMensaje(
-        `Reserva creada correctamente. Cancha: ${canchaSeleccionada.nombre}, ${reserva.fecha} de ${reserva.hora_inicio.slice(0, 5)} a ${reserva.hora_fin.slice(0, 5)}.`,
-      )
-
-      setHora('')
-
-      // Actualizar disponibilidad
-      const disponibilidad = await api.get(
-        `/reservas/disponibilidad?cancha_id=${canchaId}&fecha=${fecha}`,
-      )
-
-      setHorarios(disponibilidad.horarios)
-
-      // Actualizar mis reservas
-      const reservasActualizadas = await api.get('/reservas/')
-
-      setMisReservas(reservasActualizadas)
-    } catch (error) {
-      setError(error.message)
-    } finally {
-      setReservando(false)
-    }
-  }
+  }, [])
 
   // =====================================================
   // CANCELAR RESERVA
@@ -268,33 +117,12 @@ function Reservas() {
 
       await api.patch(`/reservas/${reservaId}/cancelar`)
 
-      const reservasActualizadas = await api.get('/reservas/')
-
-      setMisReservas(reservasActualizadas)
-
-      // Actualizar disponibilidad si la reserva
-      // pertenece a la cancha y fecha actualmente seleccionadas.
-      const reservaCancelada = reservasActualizadas.find(
-        (reserva) => reserva.id === reservaId,
-      )
-
-      if (
-        canchaId &&
-        fecha &&
-        reservaCancelada &&
-        reservaCancelada.cancha_id === Number(canchaId) &&
-        reservaCancelada.fecha === fecha
-      ) {
-        const disponibilidad = await api.get(
-          `/reservas/disponibilidad?cancha_id=${canchaId}&fecha=${fecha}`,
-        )
-
-        setHorarios(disponibilidad.horarios)
-      }
+      await cargarMisReservas()
+      setVersionDisponibilidad((version) => version + 1)
 
       setMensaje('Reserva cancelada correctamente.')
-    } catch (error) {
-      setError(error.message)
+    } catch (falla) {
+      setError(falla.message)
     } finally {
       setCancelandoId(null)
     }
@@ -313,20 +141,12 @@ function Reservas() {
   )
 
   // =====================================================
-  // FECHA MÍNIMA
-  // =====================================================
-
-  const fechaMinima = new Date()
-    .toISOString()
-    .split('T')[0]
-
-  // =====================================================
   // RENDER
   // =====================================================
 
   return (
     <section className="bg-body-tertiary min-vh-page py-6">
-      <Container style={{ maxWidth: '64rem' }}>
+      <Container style={{ maxWidth: '90rem' }}>
         <header className="mb-5">
           <SplitHeading as="h1" className="display-5" alEntrar={false}>
             Reserva tu cancha
@@ -338,136 +158,23 @@ function Reservas() {
         </header>
 
         <Reveal>
-          <Form onSubmit={handleSubmit}>
-            <Card className="border-0 shadow">
-              <Card.Body className="p-4 p-md-5">
-                <h2 className="h3 mb-4">Encuentra tu horario</h2>
-
-                <Row className="g-3">
-                  <Col md={6}>
-                    <FloatingLabel controlId="cancha" label="Cancha">
-                      <Form.Select
-                        value={canchaId}
-                        onChange={(event) => {
-                          setCanchaId(event.target.value)
-                          setHora('')
-                          setMensaje('')
-                          setError('')
-                        }}
-                        disabled={cargandoCanchas}
-                      >
-                        <option value="">
-                          {cargandoCanchas
-                            ? 'Cargando canchas…'
-                            : 'Selecciona una cancha'}
-                        </option>
-
-                        {canchas.map((cancha) => (
-                          <option key={cancha.id} value={cancha.id}>
-                            {cancha.nombre} — {cancha.tipo}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </FloatingLabel>
-                  </Col>
-
-                  <Col md={6}>
-                    <FloatingLabel controlId="fecha" label="Fecha">
-                      <Form.Control
-                        type="date"
-                        value={fecha}
-                        min={fechaMinima}
-                        onChange={(event) => {
-                          setFecha(event.target.value)
-                          setMensaje('')
-                          setError('')
-                        }}
-                      />
-                    </FloatingLabel>
-                  </Col>
-
-                  <Col md={6}>
-                    <FloatingLabel controlId="hora" label="Hora">
-                      <Form.Select
-                        value={hora}
-                        onChange={(event) => {
-                          setHora(event.target.value)
-                          setMensaje('')
-                          setError('')
-                        }}
-                        disabled={!canchaId || !fecha || cargandoHorarios}
-                      >
-                        <option value="">
-                          {cargandoHorarios
-                            ? 'Consultando disponibilidad…'
-                            : 'Selecciona una hora'}
-                        </option>
-
-                        {horariosDisponibles.map((horario) => (
-                          <option
-                            key={horario.hora_inicio}
-                            value={horario.hora_inicio}
-                          >
-                            {horario.hora_inicio}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </FloatingLabel>
-                  </Col>
-
-                  <Col md={6}>
-                    <FloatingLabel controlId="duracion" label="Duración">
-                      <Form.Select
-                        value={duracion}
-                        onChange={(event) => {
-                          setDuracion(event.target.value)
-                          setHora('')
-                          setMensaje('')
-                          setError('')
-                        }}
-                      >
-                        <option value="1">1 hora</option>
-                        <option value="2">2 horas</option>
-                      </Form.Select>
-                    </FloatingLabel>
-                  </Col>
-                </Row>
-
-                <div className="d-flex justify-content-between align-items-baseline border-top mt-4 pt-4">
-                  <span className="text-body-secondary fw-bold">
-                    Total estimado
-                  </span>
-
-                  <strong className="font-display fs-2 text-success">
-                    ${totalEstimado.toLocaleString('es-CO')}
-                  </strong>
-                </div>
-
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="lg"
-                  className="w-100 mt-4"
-                  disabled={reservando}
-                >
-                  {reservando ? 'Creando reserva…' : 'Continuar con la reserva'}
-                </Button>
-
-                {error && (
-                  <Alert variant="danger" className="mt-3 mb-0">
-                    {error}
-                  </Alert>
-                )}
-
-                {mensaje && (
-                  <Alert variant="success" className="mt-3 mb-0">
-                    {mensaje}
-                  </Alert>
-                )}
-              </Card.Body>
-            </Card>
-          </Form>
+          <ReservaAerea
+            versionDisponibilidad={versionDisponibilidad}
+            alCrearReserva={cargarMisReservas}
+          />
         </Reveal>
+
+        {error && (
+          <Alert variant="danger" className="mt-4 mb-0">
+            {error}
+          </Alert>
+        )}
+
+        {mensaje && (
+          <Alert variant="success" className="mt-4 mb-0">
+            {mensaje}
+          </Alert>
+        )}
 
         {/* ================= MIS RESERVAS ================= */}
 

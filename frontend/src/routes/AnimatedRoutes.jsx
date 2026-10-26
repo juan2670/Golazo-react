@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
-import { Routes, useLocation } from 'react-router-dom'
+import { Routes, useLocation, useNavigationType } from 'react-router-dom'
 
 import { MEDIA, ScrollTrigger, gsap } from '../animations/gsap'
 import { subirAlInicio } from '../animations/smoothScroll'
@@ -10,7 +10,18 @@ const BARRAS = 7
 // Cambia de página con franjas de césped que cubren y destapan la pantalla.
 function AnimatedRoutes({ children }) {
   const ubicacion = useLocation()
+  const tipoNavegacion = useNavigationType()
   const [mostrada, setMostrada] = useState(ubicacion)
+
+  // Las redirecciones (<Navigate replace>, por ejemplo de una página privada a
+  // /login) cambian de página sin cortina: si la página vieja siguiera montada
+  // durante la cortina, redirigiría otra vez en cada render y React entraría
+  // en un bucle ("Maximum update depth exceeded").
+  const redireccion = tipoNavegacion === 'REPLACE'
+
+  if (redireccion && ubicacion.pathname !== mostrada.pathname) {
+    setMostrada(ubicacion)
+  }
   const mostradaActual = useRef(ubicacion)
   const cortina = useRef(null)
   const [sinMovimiento] = useState(
@@ -18,7 +29,15 @@ function AnimatedRoutes({ children }) {
   )
 
   useEffect(() => {
-    if (sinMovimiento) {
+    if (sinMovimiento || redireccion) {
+      // Si la redirección llega a mitad de una cortina, la retira
+      if (redireccion && cortina.current) {
+        gsap.set(cortina.current.children, { scaleY: 0 })
+        gsap.set(cortina.current, { visibility: 'hidden' })
+        marcarCambioDePagina(false)
+      }
+
+      mostradaActual.current = ubicacion
       subirAlInicio()
       return undefined
     }
@@ -63,10 +82,10 @@ function AnimatedRoutes({ children }) {
     return () => {
       linea.kill()
     }
-  }, [ubicacion, sinMovimiento])
+  }, [ubicacion, sinMovimiento, redireccion])
 
   const rutaActiva =
-    sinMovimiento || ubicacion.pathname === mostrada.pathname
+    sinMovimiento || redireccion || ubicacion.pathname === mostrada.pathname
       ? ubicacion
       : mostrada
 
