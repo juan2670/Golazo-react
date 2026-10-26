@@ -111,7 +111,14 @@ def auth_admin(cliente, db):
 
 @pytest.fixture()
 def cancha(db):
-    nueva = Cancha(nombre="Cancha 1", tipo="Fútbol 5", precio_hora=Decimal("100000"), capacidad=10, estado=True)
+    nueva = Cancha(
+        nombre="Cancha 1",
+        tipo="Fútbol 5",
+        precio_hora=Decimal("80000"),
+        precio_noche=Decimal("100000"),
+        capacidad=10,
+        estado=True,
+    )
     db.add(nueva)
     db.commit()
     db.refresh(nueva)

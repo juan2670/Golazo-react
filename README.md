@@ -821,6 +821,62 @@ PostgreSQL
 
 ---
 
+# Reserva con vista aérea 3D
+
+La página de Reservas muestra las canchas del club en 3D desde arriba
+(React Three Fiber). El 3D sirve a la reserva: la cancha se elige tocándola y
+el panel de al lado (HTML) muestra fecha, hora, duración, precio y el botón.
+
+* Cada cancha se dibuja en código (césped en franjas, líneas, arcos, malla y
+  reflectores LED), con la distribución real del club: la **Cancha 1**
+  (fútbol 5) a la izquierda y, a la derecha, un bloque que se juega como
+  **Cancha 2** y **Cancha 3** (fútbol 5, de lado a lado) o como
+  **Cancha 2 + 3** (fútbol 8, de arriba abajo). Las entradas se marcan en el
+  piso: la de la Cancha 1 abajo a la derecha y las del bloque grande por su
+  lado izquierdo, arriba y abajo.
+* Al elegir una cancha, la cámara hace zoom sobre ella y el resto de la
+  escena queda desenfocado y atenuado (un paso de shader propio, sin
+  dependencias nuevas).
+* En «Elige tu cancha» cada cancha muestra su tarifa de día (sol) y de noche
+  (luna) por separado.
+* Reservar el fútbol 8 ocupa las canchas 2 y 3, y reservar una de ellas ocupa
+  el fútbol 8 (la otra mitad sigue libre). Lo valida el backend
+  (`cancha_padre_id`).
+* Tarifas por hora, cobradas por el backend hora por hora (desde las 6 p. m.
+  es de noche): fútbol 5 $80.000 de día y $100.000 de noche; fútbol 8
+  $140.000 de día y $160.000 de noche. Una reserva de 5 a 7 p. m. cobra una
+  hora de cada tarifa.
+* El día se elige en un calendario de mes completo (teclado: flechas,
+  Inicio/Fin, RePág/AvPág). Los días pasados no se pueden elegir.
+* Estados: **libre**, **ocupada** y **elegida**, con color, símbolo y texto.
+* La disponibilidad sale de `GET /reservas/disponibilidad` y las canchas de
+  `GET /canchas/`. El backend vuelve a validar al reservar.
+* La cámara cambia de perspectiva según el paso (general, aérea, lateral,
+  desde el arco). Con una hora de las 6 p. m. en adelante se enciende la luz
+  LED.
+* Móvil: un dedo gira, dos dedos acercan. En computador, Ctrl + rueda acerca
+  (la rueda sola desplaza la página).
+* Teclado: flechas para cambiar de cancha en el visor, Escape para volver a
+  la vista general. La lista de canchas (radios) también funciona sola.
+* Alternativa sin 3D: con "reducir movimiento", dispositivo limitado o sin
+  WebGL se abre la lista. El 3D se descarga solo cuando se usa.
+
+Código en `frontend/src/components/ReservaAerea/`.
+
+Para dejar la base de datos con las canchas y tarifas reales (desde
+`backend/`):
+
+```bash
+alembic upgrade head
+python -m app.seed
+```
+
+La migración agrega `precio_noche` y `cancha_padre_id`. El seed crea las
+canchas que falten o corrige las existentes con el mismo nombre, y avisa si
+hay otras canchas activas que no son las del club.
+
+---
+
 # Carrito
 
 El frontend cuenta actualmente con un carrito funcional mediante `CartContext`.

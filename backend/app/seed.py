@@ -1,11 +1,13 @@
-"""Carga inicial del catálogo de la tienda.
+"""Carga inicial: las canchas del club y el catálogo de la tienda.
 
 Uso (desde la carpeta backend, con el .env configurado):
 
     python -m app.seed
 
-Es idempotente: si un producto ya existe (mismo nombre) no lo duplica ni lo
-modifica. Los productos son los mismos que mostraba la tienda del frontend.
+Es idempotente. Las canchas se buscan por nombre: si faltan se crean y, si ya
+existen, se les corrigen el tipo, las tarifas y la relación con el fútbol 8.
+Si un producto ya existe (mismo nombre) no lo duplica ni lo modifica. Los
+productos son los mismos que mostraba la tienda del frontend.
 El stock inicial (STOCK_INICIAL) es un valor de ejemplo: ajústalo al
 inventario real del club.
 """
@@ -15,6 +17,7 @@ from decimal import Decimal
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
+from app.models.cancha import Cancha
 from app.models.producto import Producto
 
 
@@ -30,6 +33,54 @@ PRODUCTOS = [
     {"nombre": "Medias deportivas", "categoria": "Ropa", "precio": "25000", "foto": 35571216},
     {"nombre": "Agua", "categoria": "Bebidas", "precio": "4000", "foto": 5069203},
 ]
+
+
+# Las canchas reales del club. Las canchas 2 y 3 son las mitades del fútbol 8:
+# reservar una ocupa el fútbol 8, y reservar el fútbol 8 ocupa las dos.
+# Tarifas por hora: de día (precio_hora) y desde las 18:00 (precio_noche).
+CANCHA_GRANDE = "Cancha 2 + 3"
+
+CANCHAS = [
+    {"nombre": "Cancha 1", "tipo": "Fútbol 5", "dia": "80000", "noche": "100000", "capacidad": 10, "padre": None},
+    {"nombre": CANCHA_GRANDE, "tipo": "Fútbol 8", "dia": "140000", "noche": "160000", "capacidad": 16, "padre": None},
+    {"nombre": "Cancha 2", "tipo": "Fútbol 5", "dia": "80000", "noche": "100000", "capacidad": 10, "padre": CANCHA_GRANDE},
+    {"nombre": "Cancha 3", "tipo": "Fútbol 5", "dia": "80000", "noche": "100000", "capacidad": 10, "padre": CANCHA_GRANDE},
+]
+
+
+def sembrar_canchas(db: Session) -> tuple[int, int]:
+    """Crea las canchas que falten y deja las existentes (mismo nombre) con
+    el tipo, las tarifas y la relación correctas. Devuelve (creadas, ajustadas)."""
+    creadas = ajustadas = 0
+    por_nombre = {c.nombre: c for c in db.query(Cancha).all()}
+
+    # El orden de CANCHAS garantiza que el fútbol 8 exista antes que sus mitades
+    for datos in CANCHAS:
+        padre = por_nombre[datos["padre"]] if datos["padre"] else None
+        valores = {
+            "tipo": datos["tipo"],
+            "precio_hora": Decimal(datos["dia"]),
+            "precio_noche": Decimal(datos["noche"]),
+            "capacidad": datos["capacidad"],
+            "cancha_padre_id": padre.id if padre else None,
+        }
+        cancha = por_nombre.get(datos["nombre"])
+
+        if cancha is None:
+            cancha = Cancha(nombre=datos["nombre"], estado=True, **valores)
+            db.add(cancha)
+            creadas += 1
+        elif any(getattr(cancha, campo) != valor for campo, valor in valores.items()):
+            for campo, valor in valores.items():
+                setattr(cancha, campo, valor)
+            ajustadas += 1
+
+        db.flush()
+        por_nombre[datos["nombre"]] = cancha
+
+    db.commit()
+
+    return creadas, ajustadas
 
 
 def sembrar_productos(db: Session) -> int:
@@ -59,6 +110,22 @@ def sembrar_productos(db: Session) -> int:
 
 if __name__ == "__main__":
     with SessionLocal() as sesion:
+        canchas_creadas, canchas_ajustadas = sembrar_canchas(sesion)
         creados = sembrar_productos(sesion)
 
+        nombres = {datos["nombre"] for datos in CANCHAS}
+        otras = [
+            c.nombre
+            for c in sesion.query(Cancha).filter(Cancha.estado.is_(True)).all()
+            if c.nombre not in nombres
+        ]
+
+    print(f"Canchas creadas: {canchas_creadas}, ajustadas: {canchas_ajustadas}.")
     print(f"Productos creados: {creados} (los existentes no se tocaron).")
+
+    if otras:
+        print(
+            "Aviso: hay otras canchas activas que no son las del club: "
+            + ", ".join(otras)
+            + ". Desactívalas (estado = false) si no deben mostrarse."
+        )

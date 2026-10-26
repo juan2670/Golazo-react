@@ -10,6 +10,12 @@ from app.models.cancha import Cancha
 from app.models.reserva import Reserva
 from app.models.usuario import Usuario
 from app.schemas.reserva import ReservaCreate, ReservaResponse
+from app.services.canchas import (
+    calcular_total,
+    es_noche,
+    ids_que_comparten_espacio,
+    precio_de_hora,
+)
 
 
 router = APIRouter(
@@ -135,12 +141,14 @@ def crear_reserva(
 
     # =====================================================
     # 6. Validar conflicto
+    # (también con las canchas que comparten el espacio:
+    # el fútbol 8 y sus dos mitades de fútbol 5)
     # =====================================================
 
     reservas_existentes = (
         db.query(Reserva)
         .filter(
-            Reserva.cancha_id == reserva.cancha_id,
+            Reserva.cancha_id.in_(ids_que_comparten_espacio(db, cancha)),
             Reserva.fecha == reserva.fecha,
             Reserva.estado != "cancelada",
         )
@@ -165,16 +173,25 @@ def crear_reserva(
             inicio_existente < minutos_fin
             and fin_existente > minutos_inicio
         ):
+            if reserva_existente.cancha_id == cancha.id:
+                detalle = "La cancha ya está reservada en ese horario."
+            else:
+                detalle = (
+                    "Ese horario está ocupado: la cancha comparte espacio "
+                    "con otra que ya está reservada."
+                )
+
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="La cancha ya está reservada en ese horario.",
+                detail=detalle,
             )
 
     # =====================================================
     # 7. Calcular total
+    # (hora por hora: de día o de noche)
     # =====================================================
 
-    total = cancha.precio_hora * horas
+    total = calcular_total(cancha, hora_inicio.hour, horas)
 
     # =====================================================
     # 8. Crear reserva
@@ -277,12 +294,13 @@ def consultar_disponibilidad(
 
     # =====================================================
     # 3. Obtener reservas activas
+    # (de esta cancha y de las que comparten su espacio)
     # =====================================================
 
     reservas = (
         db.query(Reserva)
         .filter(
-            Reserva.cancha_id == cancha_id,
+            Reserva.cancha_id.in_(ids_que_comparten_espacio(db, cancha)),
             Reserva.fecha == fecha,
             Reserva.estado != "cancelada",
         )
@@ -337,6 +355,8 @@ def consultar_disponibilidad(
                 "hora_inicio": hora_inicio.strftime("%H:%M"),
                 "hora_fin": hora_fin.strftime("%H:%M"),
                 "disponible": not ocupada,
+                "noche": es_noche(hora_actual),
+                "precio": precio_de_hora(cancha, hora_actual),
             }
         )
 
